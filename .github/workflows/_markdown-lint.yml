@@ -24,16 +24,12 @@ jobs:
           set -euo pipefail
           ls -la .org-config || true
           ls -la .org-config/configs || true
-          test -f ".org-config/configs/.markdownlint.jsonc" || {
-            echo "❌ Not found: .org-config/configs/.markdownlint.jsonc"
-            exit 1
-          }
-          echo "✅ Using .org-config/configs/.markdownlint.jsonc"
+          test -f ".org-config/configs/.markdownlint.jsonc"
 
       - name: Run Markdownlint
         uses: DavidAnson/markdownlint-cli2-action@v17
         with:
-          config: ".org-config/configs/.markdownlint.jsonc"
+          config: .org-config/configs/.markdownlint.jsonc
           globs: |
             **/*.md
             !.org-config/**
