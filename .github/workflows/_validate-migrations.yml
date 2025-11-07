@@ -1,0 +1,43 @@
+name: validate-migrations
+on:
+  workflow_call:
+    inputs:
+      path:
+        description: "Migrations directory"
+        required: false
+        default: "migrations"
+        type: string
+      tool:
+        description: "goose|migrate|custom"
+        required: false
+        default: "migrate"
+        type: string
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Skip if no migrations dir
+        id: check
+        run: |
+          if [ ! -d "${{ inputs.path }}" ]; then
+            echo "present=false" >> $GITHUB_OUTPUT
+          else
+            echo "present=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Install migrate
+        if: steps.check.outputs.present == 'true' && inputs.tool == 'migrate'
+        run: |
+          curl -sL https://github.com/golang-migrate/migrate/releases/latest/download/migrate.linux-amd64.tar.gz \
+          | tar xz && sudo mv migrate /usr/local/bin/
+
+      - name: Dry-run validate (example)
+        if: steps.check.outputs.present == 'true' && inputs.tool == 'migrate'
+        run: |
+          echo "Validating ${{ inputs.path }}..."
+          # Replace with your command; below is illustrative only
+          # migrate -path "${{ inputs.path }}" -database "postgres://localhost/dev?sslmode=disable" version || true
+          # If you rely on SQL format only, at least lint filenames/order:
+          find "${{ inputs.path }}" -type f -name "*.sql" | sort -C

@@ -1,0 +1,104 @@
+name: release-docker
+on:
+  workflow_call:
+    inputs:
+      image:
+        description: "Target image name (e.g., ghcr.io/kleffio/auth)"
+        required: true
+        type: string
+      context:
+        description: "Build context"
+        required: false
+        default: "."
+        type: string
+      dockerfile:
+        description: "Path to Dockerfile"
+        required: false
+        default: "Dockerfile"
+        type: string
+      platforms:
+        description: "Target platforms"
+        required: false
+        default: "linux/amd64"
+        type: string
+      tags:
+        description: "Comma-separated list of tags"
+        required: false
+        default: "latest"
+        type: string
+      push_on:
+        description: "Event types to push on (prerelease/release/tag/push)"
+        required: false
+        default: "tag,push"
+        type: string
+    secrets:
+      REGISTRY_USERNAME:
+        required: false
+      REGISTRY_PASSWORD:
+        required: false
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to GHCR (OIDC optional)
+        if: secrets.REGISTRY_PASSWORD == '' && startsWith(inputs.image, 'ghcr.io/')
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Login to custom registry (secrets)
+        if: secrets.REGISTRY_PASSWORD != ''
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
+
+      - name: Compute tags
+        id: meta
+        run: |
+          IFS=',' read -r -a arr <<< "${{ inputs.tags }}"
+          out=""
+          for t in "${arr[@]}"; do
+            out="$out --tag ${{ inputs.image }}:${t//[[:space:]]/}"
+          done
+          echo "tags=$out" >> $GITHUB_OUTPUT
+
+      - name: Build (no push on PRs)
+        if: github.event_name == 'pull_request'
+        uses: docker/build-push-action@v6
+        with:
+          context: ${{ inputs.context }}
+          file: ${{ inputs.dockerfile }}
+          platforms: ${{ inputs.platforms }}
+          push: false
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build & Push
+        if: github.event_name != 'pull_request'
+        uses: docker/build-push-action@v6
+        with:
+          context: ${{ inputs.context }}
+          file: ${{ inputs.dockerfile }}
+          platforms: ${{ inputs.platforms }}
+          push: true
+          tags: ${{ inputs.image }}:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Push extra tags
+        if: github.event_name != 'pull_request' && inputs.tags != 'latest'
+        run: |
+          docker buildx imagetools create \
+            ${{ inputs.image }}:latest \
+            ${{ steps.meta.outputs.tags }}
