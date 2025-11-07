@@ -1,0 +1,16 @@
+name: self-check
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  yaml-lint:
+    uses: ./workflows/_yaml-lint.yml
+
+  md-lint:
+    uses: ./workflows/_markdown-lint.yml
+
+  reuse:
+    uses: ./workflows/_reuse-compliance.yml

@@ -16,5 +16,5 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           types: ${{ inputs.types }}
-          subjectPattern: '^[A-Z0-9].+'
-          subjectPatternError: 'Start the subject with a capital letter.'
+          subjectPattern: "^[A-Z0-9].+"
+          subjectPatternError: "Start the subject with a capital letter."

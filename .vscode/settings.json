@@ -1,0 +1,35 @@
+{
+  "editor.formatOnSave": true,
+  "files.eol": "\n",
+  "files.insertFinalNewline": true,
+  "files.trimTrailingWhitespace": true,
+
+  // Default: Prettier for everything
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "prettier.disableLanguages": ["yaml"],
+
+  // YAML → Red Hat (aligns with yamllint)
+  "[yaml]": {
+    "editor.defaultFormatter": "redhat.vscode-yaml",
+    "editor.insertSpaces": true,
+    "editor.tabSize": 2,
+    "editor.detectIndentation": false
+  },
+  "yaml.format.enable": true,
+  "yaml.format.singleQuote": false,
+  "yaml.format.bracketSpacing": false,
+  "yaml.format.proseWrap": "preserve",
+  "yaml.validate": true,
+
+  // Markdown → Prettier + markdownlint rules
+  "[markdown]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true
+  },
+  "markdownlint.config": "./.markdownlint.jsonc",
+
+  // Optional: Go explicit
+  "[go]": {
+    "editor.defaultFormatter": "golang.go"
+  }
+}
