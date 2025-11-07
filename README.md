@@ -1,1 +1,97 @@
-# kleffio
+<p align="center">
+  <img src="https://raw.githubusercontent.com/kleffio/.github/main/profile/kleff-banner.png" alt="Kleff Logo" width="140"/>
+</p>
+
+<h1 align="center">Kleff Hosting</h1>
+
+<p align="center">
+  <b>Build. Host. Scale. Your Way.</b><br/>
+  The open platform for developers to deploy, manage, and scale web and game servers with ease.
+</p>
+
+<p align="center">
+  <a href="https://kleff.io">🌐 kleff.io</a> • 
+  <a href="mailto:kleffioapp@gmail.com">📧 Contact</a> • 
+  🇨🇦 Based in Canada
+</p>
+
+---
+
+## 🧠 What is Kleff?
+
+**Kleff** is an open-source hosting platform designed to make **server deployment simple, powerful, and developer-friendly**.  
+Inspired by Pterodactyl and Vercel, Kleff provides a **modular API-driven ecosystem** for hosting both **web** and **game servers** — built entirely around clean architecture and modern DevOps principles.
+
+Whether you’re running a Minecraft server, deploying a full-stack web app, or managing CI/CD pipelines, Kleff gives you full control over your infrastructure — locally or in the cloud.
+
+---
+
+## 🏗️ Architecture Overview
+
+Kleff is composed of microservices that work together seamlessly:
+
+| Service | Description |
+|----------|--------------|
+| **Auth Service** | Handles authentication, JWT sessions, and secure token management. |
+| **Container Service** | Manages lifecycle of Docker containers (create, start, stop, restart, delete). |
+| **API Gateway** | Entry point for all client and SDK interactions. |
+| **Frontend Dashboard** | Modern UI for developers to deploy and monitor servers. |
+| **Metrics & Monitoring** | Integration with Prometheus and Grafana for live server stats. |
+
+Each service is containerized and built for horizontal scalability — perfect for distributed hosting setups.
+
+---
+
+## ⚙️ Tech Stack
+
+- **Go** — backend services & API gateway  
+- **TypeScript / React** — frontend dashboard  
+- **Docker** — container orchestration  
+- **PostgreSQL / MongoDB** — persistent data storage  
+- **Nginx / BunkerWeb** — reverse proxy layer  
+- **Prometheus / Grafana** — observability & metrics  
+
+---
+
+## 🧩 Open Source Philosophy
+
+Kleff’s mission is to **empower developers to self-host without compromise.**  
+We believe in open systems, transparent architecture, and community-driven innovation.
+
+All core components of Kleff are open-sourced — from the API to the deployment engine — to encourage contributions, learning, and customization.
+
+---
+
+## 🚀 Getting Started
+
+1. Explore our core repositories:
+   - [`kleff-auth`](https://github.com/kleffio/kleff-auth)
+
+2. Follow setup instructions in each repo’s README.
+
+3. Join the community and help shape the future of developer hosting.
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome!  
+Please check our [CONTRIBUTING.md](https://github.com/kleffio/.github/blob/main/CONTRIBUTING.md) for guidelines on issues, pull requests, and code style.
+
+---
+
+## 🛡️ License
+
+This project is licensed under the **MIT License** — see the [LICENSE](https://github.com/kleffio/.github/blob/main/LICENSE) file for details.
+
+---
+
+<p align="center">
+  <sub>© 2025 Kleff Hosting — Open Source by <a href="https://github.com/isaacwallace123">Isaac Wallace</a></sub>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Built%20with-Go-blue?style=for-the-badge&logo=go" alt="Go Badge"/>
+  <img src="https://img.shields.io/badge/Powered%20by-Docker-blueviolet?style=for-the-badge&logo=docker"/>
+  <img src="https://img.shields.io/badge/Open%20Source-Yes-2ea44f?style=for-the-badge&logo=github"/>
+</p>
