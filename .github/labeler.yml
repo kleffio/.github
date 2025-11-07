@@ -1,17 +1,19 @@
-"feature":
+feature:
   - any: ["**/*.go", "internal/**", "cmd/**"]
   - head-branch: ['^feature/']
-"bugfix":
+
+bugfix:
   - head-branch: ['^bugfix/', '^fix/']
-"chore":
+
+chore:
   - head-branch: ['^chore/', '^deps/']
   - any: [".github/**", "**/Dockerfile", "**/docker-compose*.yml"]
-"docs":
+
+docs:
   - any: ["**/*.md", "docs/**"]
-"security":
+
+security:
   - any: ["internal/**/crypto/**", "**/*auth*/*", "**/security/**"]
-"tests":
+
+tests:
   - any: ["**/*_test.go", "test/**"]
-"refactor":
-  - head-branch: ['^refactor/']
-  - any: ["**/refactor/**"]

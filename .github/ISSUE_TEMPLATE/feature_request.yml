@@ -1,8 +1,29 @@
-name: Feature Request
-description: Propose an enhancement
-labels: [feature]
+name: "✨ Feature request"
+description: "Suggest an idea for Kleff"
+labels: ["feature"]
 body:
   - type: textarea
+    id: problem
+    attributes:
+      label: Problem statement
+      description: What problem would this solve?
+      placeholder: "Explain the use-case or pain point"
+    validations:
+      required: true
+
+  - type: textarea
     id: proposal
-    attributes: { label: Proposal, description: What and why? }
-    validations: { required: true }
+    attributes:
+      label: Proposed solution
+      description: Describe the feature and how it should work.
+      placeholder: "High-level approach, API, UX, etc."
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Any alternative solutions or features you’ve considered?
+    validations:
+      required: false
