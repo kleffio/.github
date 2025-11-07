@@ -8,7 +8,6 @@ permissions:
 jobs:
   markdownlint:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout target repo
         uses: actions/checkout@v4
@@ -18,24 +17,24 @@ jobs:
         with:
           repository: kleffio/.github
           ref: main
-          path: .github-org
+          path: .org-config
 
       - name: Verify central config exists
         run: |
           set -euo pipefail
-          ls -la .github-org || true
-          ls -la .github-org/configs || true
-          test -f ".github-org/configs/.markdownlint.jsonc" || {
-            echo "❌ Not found: .github-org/configs/.markdownlint.jsonc"
+          ls -la .org-config || true
+          ls -la .org-config/configs || true
+          test -f ".org-config/configs/.markdownlint.jsonc" || {
+            echo "❌ Not found: .org-config/configs/.markdownlint.jsonc"
             exit 1
           }
-          echo "✅ Found .github-org/configs/.markdownlint.jsonc"
+          echo "✅ Using .org-config/configs/.markdownlint.jsonc"
 
       - name: Run Markdownlint
         uses: DavidAnson/markdownlint-cli2-action@v17
         with:
-          config: ".github-org/configs/.markdownlint.jsonc"
+          config: ".org-config/configs/.markdownlint.jsonc"
           globs: |
             **/*.md
-            !.github-org/**
+            !.org-config/**
             !.git/**
