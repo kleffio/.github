@@ -80,6 +80,19 @@ Please check our [CONTRIBUTING.md](https://github.com/kleffio/.github/blob/main/
 
 ---
 
+## 🧭 Community & Policies
+
+Kleff is committed to building an open, welcoming, and secure environment for developers.  
+Before contributing or reporting issues, please review our community guidelines:
+
+- [Code of Conduct](https://github.com/kleffio/.github/blob/main/CODE_OF_CONDUCT.md) — our standards for respectful collaboration.  
+- [Contributing Guide](https://github.com/kleffio/.github/blob/main/CONTRIBUTING.md) — how to submit issues, pull requests, and follow project conventions.  
+- [Security Policy](https://github.com/kleffio/.github/blob/main/SECURITY.md) — how to responsibly report vulnerabilities.  
+
+Your participation helps shape the future of Kleff 🚀
+
+---
+
 ## 🛡️ License
 
 This project is licensed under the **MIT License** — see the [LICENSE](https://github.com/kleffio/.github/blob/main/LICENSE) file for details.
