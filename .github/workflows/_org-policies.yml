@@ -5,25 +5,45 @@ on:
 jobs:
   yamllint:
     uses: kleffio/.github/.github/workflows/_yaml-lint.yml@main
+    permissions:
+      contents: read
 
   markdownlint:
     uses: kleffio/.github/.github/workflows/_markdown-lint.yml@main
+    permissions:
+      contents: read
 
   actionlint:
     uses: kleffio/.github/.github/workflows/_actionlint.yml@main
+    permissions:
+      contents: read
 
   pr-title:
     uses: kleffio/.github/.github/workflows/_pr-title.yml@main
+    permissions:
+      contents: read
 
   require-label:
     uses: kleffio/.github/.github/workflows/_require-label.yml@main
+    permissions:
+      contents: read
 
   openssf:
     uses: kleffio/.github/.github/workflows/_openssf-scorecard.yml@main
+    permissions:
+      contents: read
 
   reuse:
     uses: kleffio/.github/.github/workflows/_reuse-compliance.yml@main
+    permissions:
+      contents: read
+
   label-sync:
     uses: kleffio/.github/.github/workflows/_label-sync.yml@main
+    permissions:
+      contents: read
+
   auto-label:
     uses: kleffio/.github/.github/workflows/_auto-label.yml@main
+    permissions:
+      contents: read
