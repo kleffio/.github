@@ -1,0 +1,13 @@
+name: size-labels
+on: { workflow_call: {} }
+jobs:
+  size:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: pascalgn/size-label-action@v0.5.7
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          IGNORED: "dist/** build/** *.lock"
+          SIZES: >
+            {"size: XS": 0, "size: S": 50, "size: M": 200,
+             "size: L": 500, "size: XL": 1000, "size: XXL": 2000}

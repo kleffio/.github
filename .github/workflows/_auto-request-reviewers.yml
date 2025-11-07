@@ -1,0 +1,9 @@
+name: auto-request-reviewers
+on: { workflow_call: {} }
+jobs:
+  request:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: necojackarc/auto-request-review@v0.7.0
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
