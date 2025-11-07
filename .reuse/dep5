@@ -1,0 +1,30 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: Kleff
+Upstream-Contact: Kleff Maintainers <kleffioapp@gmail.com>
+Source: https://github.com/kleffio
+
+Files: *
+Copyright: © 2025 Kleff Hosting
+License: LicenseRef-Kleff-Public-License-1.0
+
+License: LicenseRef-Kleff-Public-License-1.0
+ This software is licensed under the Kleff Public License v1.0 (KPL),
+ based on the Apache License, Version 2.0 (January 2004).
+ 
+ You may obtain a copy of the Apache 2.0 license at:
+ http://www.apache.org/licenses/LICENSE-2.0
+
+ This license allows free use, modification, and distribution of the Kleff
+ software and its source code, including for commercial purposes,
+ as long as the Kleff software itself is not offered as a paid or
+ commercial hosted service (“Kleff-as-a-Service”).
+
+ You may use Kleff to host your own applications, game servers,
+ or websites (commercial or not).
+
+ You may not offer Kleff itself, or any derivative of Kleff,
+ as a paid hosted platform without explicit permission.
+
+ “Kleff” and the Kleff logo are trademarks of Kleff Hosting.
+ Use of the Kleff name or logo in a misleading or competitive
+ manner is prohibited.
