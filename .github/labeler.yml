@@ -1,19 +1,26 @@
 feature:
-  - any: ["**/*.go", "internal/**", "cmd/**"]
-  - head-branch: ['^feature/']
+  - changed-files:
+      - any-glob-to-any-file: ["**/*.go", "internal/**", "cmd/**"]
+  - head-branch: ["^feature/"]
 
 bugfix:
-  - head-branch: ['^bugfix/', '^fix/']
+  - head-branch: ["^bugfix/", "^fix/"]
 
 chore:
-  - head-branch: ['^chore/', '^deps/']
-  - any: [".github/**", "**/Dockerfile", "**/docker-compose*.yml"]
+  - head-branch: ["^chore/", "^deps/"]
+  - changed-files:
+      - any-glob-to-any-file:
+          [".github/**", "**/Dockerfile", "**/docker-compose*.yml"]
 
 docs:
-  - any: ["**/*.md", "docs/**"]
+  - changed-files:
+      - any-glob-to-any-file: ["**/*.md", "docs/**"]
 
 security:
-  - any: ["internal/**/crypto/**", "**/*auth*/*", "**/security/**"]
+  - changed-files:
+      - any-glob-to-any-file:
+          ["internal/**/crypto/**", "**/*auth*/*", "**/security/**"]
 
 tests:
-  - any: ["**/*_test.go", "test/**"]
+  - changed-files:
+      - any-glob-to-any-file: ["**/*_test.go", "test/**"]
