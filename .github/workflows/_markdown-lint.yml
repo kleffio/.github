@@ -12,23 +12,25 @@ jobs:
       - name: Checkout target repo
         uses: actions/checkout@v4
 
-      - name: Ensure markdownlint config (use org default if missing)
+      - name: Checkout org config repo
+        uses: actions/checkout@v4
+        with:
+          repository: kleffio/.github
+          ref: main
+          path: .org-config
+
+      - name: Verify central config exists
         run: |
           set -euo pipefail
-          if [ ! -f .markdownlint.jsonc ]; then
-            echo "No local .markdownlint.jsonc; fetching org default..."
-            curl -fsSL \
-              https://raw.githubusercontent.com/kleffio/.github/main/configs/.markdownlint.jsonc \
-              -o .markdownlint.jsonc
-          fi
-          test -s .markdownlint.jsonc
-          echo "Using config:"
-          head -n 5 .markdownlint.jsonc || true
+          ls -la .org-config || true
+          ls -la .org-config/configs || true
+          test -f ".org-config/configs/.markdownlint.jsonc"
 
       - name: Run Markdownlint
         uses: DavidAnson/markdownlint-cli2-action@v17
         with:
-          config: .markdownlint.jsonc
+          config: .org-config/configs/.markdownlint.jsonc
           globs: |
             **/*.md
+            !.org-config/**
             !.git/**
