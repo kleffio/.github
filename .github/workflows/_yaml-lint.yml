@@ -10,9 +10,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      
+      - name: Check for local config
+        id: config
+        run: |
+          if [ -f .yamllint.yml ]; then
+            echo "config_file=.yamllint.yml" >> $GITHUB_OUTPUT
+          else
+            echo "config_file=" >> $GITHUB_OUTPUT
+          fi
+      
       - name: Lint YAML files
         uses: ibiqlik/action-yamllint@v3
         with:
           format: github
-          config_file: .yamllint.yml
+          config_file: ${{ steps.config.outputs.config_file }}
           file_or_dir: .
