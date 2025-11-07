@@ -63,7 +63,7 @@ If you discover a security issue, please follow our [Security Policy](./SECURITY
 
 ## 📜 License
 
-All documentation and policy content in this repository are licensed under the **MIT License**.  
+All documentation and policy content in this repository are licensed under the **APACHE 2.0 License**.  
 See the [LICENSE](./LICENSE) file for details.
 
 ---
