@@ -1,40 +1,35 @@
 name: _markdown-lint
 on:
-  workflow_call:
-    inputs:
-      config_repo:
-        type: string
-        default: kleffio/.github
-      config_ref:
-        type: string
-        default: main
-      config_path:
-        type: string
-        default: configs
+  workflow_call: {}
+
+permissions:
+  contents: read
 
 jobs:
   markdownlint:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout target repository
         uses: actions/checkout@v4
 
-      - name: Checkout centralized configs
-        uses: actions/checkout@v4
-        with:
-          repository: ${{ inputs.config_repo }}
-          ref: ${{ inputs.config_ref }}
-          path: .github-org
-
-      - name: Debug (list central configs)
-        run: ls -laR .github-org/${{ inputs.config_path }}
+      - name: Resolve Markdownlint config
+        id: config
+        run: |
+          set -euo pipefail
+          if [ -f .markdownlint.jsonc ]; then
+            echo "config_file=.markdownlint.jsonc" >> $GITHUB_OUTPUT
+          else
+            echo "Fetching org-level config from kleffio/.github..."
+            git clone --depth=1 https://github.com/kleffio/.github tmp-org
+            echo "config_file=tmp-org/.github/configs/.markdownlint.jsonc" >> $GITHUB_OUTPUT
+          fi
+          echo "Resolved config file: $(grep config_file= $GITHUB_OUTPUT)"
 
       - name: Run Markdownlint
         uses: DavidAnson/markdownlint-cli2-action@v17
         with:
-          config: ".github-org/${{ inputs.config_path }}/.markdownlint.jsonc"
+          config: ${{ steps.config.outputs.config_file }}
           globs: |
             **/*.md
-            !.github-org/**
+            !tmp-org/**
             !.git/**
