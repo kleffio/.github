@@ -1,39 +1,29 @@
+# Feature
+
+<!-- kleff-template: feature -->
+
 ## Summary
-<!-- What does this feature add and why? Provide a concise overview. -->
 
-
-## Motivation / Context
-<!-- Tickets, user story, pain point. Link issues: Closes #123 -->
-
+Short description of the feature and why we’re doing it.
 
 ## Implementation Notes
-- Architecture / design decisions:
-- New endpoints / contracts:
-- DB or schema changes (migrations):
-- Feature flags / configs:
 
-
-## Screenshots / Demos (if UI or CLI)
-<!-- Images, gifs, or terminal output -->
-
+- Architecture / design decisions
+- New packages / services
+- Breaking changes (if any)
 
 ## Testing Instructions
-1. Steps to verify the feature locally
-2. Key edge cases covered
-3. New/updated tests and coverage
 
+1. Steps to verify the feature
+2. Expected results
 
 ## Rollout & Risk
-- Backwards compatible? Yes/No (explain)
-- Data migrations? Yes/No (instructions)
-- Rollback plan:
-- Monitoring/alerts to watch:
 
+- Backwards compatible? Yes/No
+- Rollback plan (how to revert safely)
 
 ## Checklist
-- [ ] **2+ approvals** (incl. Code Owner when applicable)
-- [ ] All required status checks pass
-- [ ] All conversations resolved
-- [ ] Latest push approved (branch protection)
-- [ ] Docs updated (README/CHANGELOG/API)
-- [ ] Security/privacy reviewed (if relevant)
+
+- [ ] **2+ approvals** (incl. code owner where applicable)
+- [ ] Updated docs / changelog (if needed)
+- [ ] Tests added/updated (if applicable)

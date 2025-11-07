@@ -1,26 +1,28 @@
-## Refactor Summary
-<!-- Internal code changes without behavioral changes -->
+# Refactor
 
+<!-- kleff-template: refactor -->
+
+## Refactor Summary
+
+What’s being refactored and why (readability, maintainability, performance).
 
 ## Goals
-- Improve readability / maintainability
-- Reduce complexity / duplication
-- Performance improvements (non-functional)
 
+- Improve readability / maintainability
+- Reduce duplication / complexity
+- Prepare for upcoming feature X
 
 ## Approach
-- Modules/files touched:
-- Patterns introduced/removed:
-- Risks / gotchas:
 
+- Modules/files touched:
+- Patterns applied / removed:
 
 ## Validation
-- Test suite green
-- Behavior verified identical (explain how)
 
+- Test suite green
+- Benchmarks (if perf-related)
 
 ## Checklist
-- [ ] **2+ approvals** (incl. Code Owner when applicable)
-- [ ] All required status checks pass
-- [ ] All conversations resolved
-- [ ] No API/contract changes (or documented if there are)
+
+- [ ] **2+ approvals** (incl. code owner where applicable)
+- [ ] No behavior changes (unless stated above)

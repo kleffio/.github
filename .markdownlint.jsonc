@@ -1,0 +1,12 @@
+{
+  // Start with defaults, then relax a few noisy rules for org docs
+  "default": true,
+
+  // Long lines are common in policy/legal text and profile banners
+  "MD013": false,
+
+  // Allow a few safe HTML tags we use in the org profile/README
+  "MD033": {
+    "allowed_elements": ["p", "img", "h1", "b", "br", "sub", "a"]
+  }
+}

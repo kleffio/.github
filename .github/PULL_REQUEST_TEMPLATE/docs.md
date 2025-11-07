@@ -1,21 +1,23 @@
-## Documentation Update
-<!-- What docs are updated/added and why? -->
+# Documentation Update
 
+<!-- kleff-template: docs -->
+
+## Summary
+
+What changed and why.
 
 ## Affected Docs
-- README
-- API reference
-- Runbooks / on-call docs
-- ADRs / architecture diagrams
 
+- README
+- CONTRIBUTING
+- API references / diagrams
 
 ## Verification
-- Lint/preview passes
-- Links validated
 
+- Lint/preview passes
+- Screenshots (if visual)
 
 ## Checklist
-- [ ] **2+ approvals** (incl. Code Owner when applicable)
-- [ ] All required status checks pass (docs build/links if applicable)
-- [ ] All conversations resolved
-- [ ] Cross-links and versioning updated
+
+- [ ] **2+ approvals** (incl. docs owner where applicable)
+- [ ] Links updated (if paths changed)

@@ -1,30 +1,29 @@
-## Bug Description
-<!-- What was broken from a user perspective? -->
+# Bugfix
 
+<!-- kleff-template: bugfix -->
+
+## Bug Description
+
+What’s broken and where it shows up.
 
 ## Root Cause Analysis
+
 - Trigger:
-- Scope of impact:
-- Why now:
-
-
-## Fix Summary
-<!-- What changed to fix it? Rationale for the approach. -->
-
+- Scope/Blast radius:
+- Logs/metrics/trace links:
 
 ## Repro Steps & Tests
-- Repro steps before fix:
-- Added/updated tests that fail before and pass after:
 
+- Repro steps before fix:
+- Added tests / evidence after fix:
 
 ## Risk & Rollback
-- Risk level: Low/Medium/High (why)
+
+- Risk level: Low/Medium/High
 - Rollback plan:
 
-
 ## Checklist
-- [ ] **2+ approvals** (incl. Code Owner when applicable)
-- [ ] All required status checks pass
-- [ ] All conversations resolved
-- [ ] Latest push approved (branch protection)
-- [ ] Linked issues closed (e.g., Fixes #123)
+
+- [ ] **2+ approvals** (incl. code owner where applicable)
+- [ ] Tests cover the regression
+- [ ] User-facing notes added (if any)

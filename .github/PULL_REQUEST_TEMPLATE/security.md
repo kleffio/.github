@@ -1,27 +1,28 @@
-## Security Change Summary
-<!-- Security fix or change in auth/permissions/cryptography/headers/etc. -->
+# Security
 
+<!-- kleff-template: security -->
+
+## Security Change Summary
+
+What’s the threat or class of issue.
 
 ## Threat / Vulnerability
-- Classification (e.g., XSS/CSRF/IDOR/Hardening)
-- Affected components:
 
+- Classification (e.g., XSS/CSRF/IDOR/ACL)
+- Affected area(s)
+- References (CVE/advisory, if applicable)
 
 ## Mitigation
-- Changes made:
-- Backward compatibility:
 
+- Changes made:
+- Additional hardening (if any):
 
 ## Validation
-- Repro PoC (before) and results (after):
-- Tests added (unit/integration/e2e):
-- Static/dynamic scans:
 
+- Repro PoC (before) and results after fix
+- Tests / scans / tools used
 
 ## Checklist
-- [ ] **2+ approvals** (incl. Code Owner when applicable)
-- [ ] All required status checks pass
-- [ ] All conversations resolved
-- [ ] Secrets and keys validated (no plaintext)
-- [ ] Docs/runbooks updated
-- [ ] Linked issues: Closes #___
+
+- [ ] **2+ approvals** (incl. security owner where applicable)
+- [ ] Backport/forward-port plan (if needed)

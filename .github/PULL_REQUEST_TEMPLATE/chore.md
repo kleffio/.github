@@ -1,25 +1,28 @@
-## Chore Summary
-<!-- Maintenance/refactor/build/devex changes with no feature impact -->
+# Chore
 
+<!-- kleff-template: chore -->
+
+## Chore Summary
+
+Maintenance/dev-ex changes.
 
 ## Scope
-- Code cleanup / formatting
-- Dependency bump(s)
-- CI/CD or config changes
 
+- Code cleanup / formatting
+- Dependency updates
+- CI/CD tweaks
 
 ## Impact
-- User-facing changes: Yes/No
-- Risk level: Low/Medium/High (why)
 
+- User-facing changes: Yes/No
+- Risk level: Low/Medium/High
 
 ## Verification
-- Local run / CI proof:
-- Any special validation steps:
 
+- Local run / CI proof:
+- Notes for follow-ups (if any)
 
 ## Checklist
-- [ ] **2+ approvals** (incl. Code Owner when applicable)
-- [ ] All required status checks pass
-- [ ] All conversations resolved
-- [ ] No behavior or API changes (or documented if there are)
+
+- [ ] **2+ approvals** (incl. owner where applicable)
+- [ ] CI remains green
