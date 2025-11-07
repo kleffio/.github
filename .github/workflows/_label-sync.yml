@@ -1,9 +1,11 @@
 name: label-sync
 on:
   workflow_call: {}
+
 permissions:
   contents: read
   issues: write
+
 jobs:
   sync:
     runs-on: ubuntu-latest

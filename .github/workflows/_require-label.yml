@@ -6,6 +6,7 @@ on:
         type: string
         required: false
         default: "feature,bugfix,chore,docs,refactor,security,tests"
+
 jobs:
   check:
     runs-on: ubuntu-latest

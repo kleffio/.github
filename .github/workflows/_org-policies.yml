@@ -1,0 +1,29 @@
+name: Org Policies
+on:
+  workflow_call: {}
+
+jobs:
+  yamllint:
+    uses: kleffio/.github/.github/workflows/_yaml-lint.yml@main
+
+  markdownlint:
+    uses: kleffio/.github/.github/workflows/_markdown-lint.yml@main
+
+  actionlint:
+    uses: kleffio/.github/.github/workflows/_actionlint.yml@main
+
+  pr-title:
+    uses: kleffio/.github/.github/workflows/_pr-title.yml@main
+
+  require-label:
+    uses: kleffio/.github/.github/workflows/_require-label.yml@main
+
+  openssf:
+    uses: kleffio/.github/.github/workflows/_openssf-scorecard.yml@main
+
+  reuse:
+    uses: kleffio/.github/.github/workflows/_reuse-compliance.yml@main
+  label-sync:
+    uses: kleffio/.github/.github/workflows/_label-sync.yml@main
+  auto-label:
+    uses: kleffio/.github/.github/workflows/_auto-label.yml@main
