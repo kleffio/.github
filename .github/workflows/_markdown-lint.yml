@@ -1,16 +1,26 @@
-name: markdown-lint
+name: _markdown-lint
 on:
-  workflow_call: {}
-
-permissions:
-  contents: read
+  workflow_call:
+    inputs:
+      config_repo: { type: string, default: kleffio/.github }
+      config_ref:  { type: string, default: main }
+      config_path: { type: string, default: configs }
 
 jobs:
-  lint:
+  markdownlint:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: DavidAnson/markdownlint-cli2-action@v17
+
+      - name: Checkout org configs
+        uses: actions/checkout@v4
         with:
-          globs: |
-            **/*.md
+          repository: ${{ inputs.config_repo }}
+          ref: ${{ inputs.config_ref }}
+          path: .org-config
+
+      - name: Markdownlint
+        uses: DavidAnson/markdownlint-cli2-action@v17
+        with:
+          globs: "**/*.md"
+          config: ".org-config/${{ inputs.config_path }}/.markdownlint.jsonc"

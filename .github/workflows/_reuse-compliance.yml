@@ -1,6 +1,11 @@
-name: reuse-compliance
+name: _reuse-compliance
 on:
-  workflow_call: {}
+  workflow_call:
+    inputs:
+      config_repo: { type: string, default: kleffio/.github }
+      config_ref:  { type: string, default: main }
+      reuse_toml_path: { type: string, default: configs/REUSE.toml }
+      licenses_dir_path: { type: string, default: LICENSES }
 
 permissions:
   contents: read
@@ -10,4 +15,27 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: fsfe/reuse-action@v4
+
+      - name: Checkout org configs
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ inputs.config_repo }}
+          ref: ${{ inputs.config_ref }}
+          path: .org-config
+
+      - name: Provision REUSE files (ephemeral)
+        run: |
+          set -euo pipefail
+          if [ ! -f REUSE.toml ]; then
+            cp ".org-config/${{ inputs.reuse_toml_path }}" REUSE.toml
+          fi
+          if [ ! -d LICENSES ]; then
+            mkdir -p LICENSES
+            rsync -a ".org-config/${{ inputs.licenses_dir_path }}/" LICENSES/
+          fi
+          echo "Provisioned REUSE files for lint run."
+
+      - name: REUSE Compliance
+        uses: fsfe/reuse-action@v3
+        with:
+          args: --include-submodules

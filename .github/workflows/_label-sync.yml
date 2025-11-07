@@ -1,18 +1,33 @@
-name: label-sync
+name: _label-sync
 on:
-  workflow_call: {}
+  workflow_call:
+    inputs:
+      config_repo: { type: string, default: kleffio/.github }
+      config_ref:  { type: string, default: main }
+      labels_path: { type: string, default: configs/.github/labels.yml }
 
 permissions:
   contents: read
   issues: write
+  pull-requests: write
 
 jobs:
-  sync:
+  labeler:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: crazy-max/ghaction-github-labeler@v5
+
+      - name: Checkout org configs
+        uses: actions/checkout@v4
         with:
-          configuration-path: .github/labels.yml
+          repository: ${{ inputs.config_repo }}
+          ref: ${{ inputs.config_ref }}
+          path: .org-config
+
+      - name: Sync labels
+        uses: crazy-max/ghaction-github-labeler@v5
+        with:
+          yaml-file: ".org-config/${{ inputs.labels_path }}"
           skip-delete: false
           dry-run: false
+          github-token: ${{ secrets.GITHUB_TOKEN }}
