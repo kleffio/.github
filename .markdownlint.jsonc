@@ -2,9 +2,6 @@
   // Start with defaults, then relax a few noisy rules for org docs
   "default": true,
 
-  // Long lines are common in policy/legal text and profile banners
-  "MD013": false,
-
   // Allow missing top-level heading in org profile/README
   "MD041": false,
 
@@ -22,6 +19,6 @@
   // Ignore code blocks for trailing space checks
   "MD009": {"ignore_code_blocks": true},
 
-  // Optional: disable line-length warnings inside tables (common in docs)
+  // disable line-length warnings inside tables (common in docs)
   "MD013": {"tables": false, "line_length": 120, "ignore_code_blocks": true}
 }
