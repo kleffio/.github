@@ -95,7 +95,7 @@ Your participation helps shape the future of Kleff 🚀
 
 ## 🛡️ License
 
-This project is licensed under the **MIT License** — see the [LICENSE](https://github.com/kleffio/.github/blob/main/LICENSE) file for details.
+This project is licensed under the **APACHE 2.0 License** — see the [LICENSE](https://github.com/kleffio/.github/blob/main/LICENSE) file for details.
 
 ---
 
