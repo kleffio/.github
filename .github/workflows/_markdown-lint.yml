@@ -1,9 +1,6 @@
 name: _markdown-lint
 on:
-  workflow_call:
-    inputs:
-      config_repo: { type: string, default: kleffio/.github }
-      config_ref:  { type: string, default: main }
+  workflow_call: {}
 
 permissions:
   contents: read
@@ -11,6 +8,7 @@ permissions:
 jobs:
   markdownlint:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout target repo
         uses: actions/checkout@v4
@@ -18,35 +16,25 @@ jobs:
       - name: Checkout org config repo
         uses: actions/checkout@v4
         with:
-          repository: ${{ inputs.config_repo }}
-          ref: ${{ inputs.config_ref }}
+          repository: kleffio/.github
+          ref: main
           path: .github-org
 
-      - name: Resolve markdownlint config
-        id: cfg
-        shell: bash
+      - name: Verify central config exists
         run: |
           set -euo pipefail
-          candidates=(
-            ".github-org/configs/.markdownlint.jsonc"
-            ".github-org/.github/configs/.markdownlint.jsonc"
-          )
-          for c in "${candidates[@]}"; do
-            if [[ -f "$c" ]]; then
-              echo "config_file=$c" >> "$GITHUB_OUTPUT"
-              echo "Using config: $c"
-              exit 0
-            fi
-          done
-          echo "Searched for:"
-          printf ' - %s\n' "${candidates[@]}"
-          echo "❌ Could not find .markdownlint.jsonc in ${{ inputs.config_repo }}@${{ inputs.config_ref }}"
-          exit 1
+          ls -la .github-org || true
+          ls -la .github-org/configs || true
+          test -f ".github-org/configs/.markdownlint.jsonc" || {
+            echo "❌ Not found: .github-org/configs/.markdownlint.jsonc"
+            exit 1
+          }
+          echo "✅ Found .github-org/configs/.markdownlint.jsonc"
 
       - name: Run Markdownlint
         uses: DavidAnson/markdownlint-cli2-action@v17
         with:
-          config: ${{ steps.cfg.outputs.config_file }}
+          config: ".github-org/configs/.markdownlint.jsonc"
           globs: |
             **/*.md
             !.github-org/**
