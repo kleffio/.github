@@ -1,5 +1,37 @@
 extends: default
+
+ignore: |
+  .git/**
+  LICENSES/**
+  node_modules/**
+  dist/**
+  build/**
+  coverage/**
+
 rules:
-  line-length: { max: 140 }
-  truthy:
-    allowed-values: ["true", "false", "on", "off", "yes", "no"]
+  indentation:
+    spaces: 2
+    indent-sequences: false
+    check-multi-line-strings: false
+  line-length:
+    max: 120
+    allow-non-breakable-words: true
+    allow-non-breakable-inline-mappings: true
+  trailing-spaces: enable
+  new-line-at-end-of-file: enable
+  empty-lines:
+    max: 1
+    max-start: 0
+    max-end: 0
+
+  document-start: disable
+  comments: disable
+  comments-indentation: disable
+  truthy: enable
+
+  key-duplicates: enable
+  colons: enable
+  commas: enable
+  hyphens: enable
+  brackets: enable
+  braces: enable
