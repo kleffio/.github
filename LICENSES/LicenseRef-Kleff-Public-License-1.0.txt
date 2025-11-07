@@ -1,0 +1,109 @@
+SPDX-License-Identifier: LicenseRef-Kleff-Public-License-1.0
+
+Kleff Public License v1.0 (KPL)
+Based on the Apache License, Version 2.0 (January 2004)
+http://www.apache.org/licenses/
+
+---------------------------------------------------------------------
+
+1. Overview
+
+This license allows free use, modification, and distribution of the Kleff
+software and its source code, including for commercial purposes — as long
+as the Kleff software itself is not offered as a paid or commercial hosted
+service.
+
+You may:
+- Use, copy, modify, and distribute the software.
+- Deploy Kleff to host your own applications, game servers, or websites
+  (commercial or not).
+- Build commercial products that use Kleff internally.
+
+You may not:
+- Offer Kleff, or any derivative or substantially similar service, as a
+  hosted or paid platform to third parties (“Kleff-as-a-Service”).
+- Use the Kleff name, logo, or brand to promote any service without explicit
+  written permission.
+
+---------------------------------------------------------------------
+
+2. License Terms
+
+Except as modified below, this software is licensed under the Apache License,
+Version 2.0, including its grant of copyright, patent rights, and disclaimers.
+
+You may obtain a copy of the full Apache 2.0 license at:
+http://www.apache.org/licenses/LICENSE-2.0
+
+---------------------------------------------------------------------
+
+3. Additional Terms for Kleff
+
+3.1. Definition of “Hosted Service”
+A “Hosted Service” means any commercial offering to third parties where the
+Kleff software (or a modified version of it) is provided as an online service,
+platform, or API for which users pay directly or indirectly.
+
+Examples include:
+- Offering Kleff’s dashboard, API, or container orchestration as a hosted
+  product.
+- Running Kleff and charging others to use its management interface or
+  deployment features.
+
+3.2. Permitted Uses
+You are free to:
+- Host and monetize your own software, websites, or servers using Kleff.
+- Use Kleff internally within your organization or for client work.
+- Distribute modified versions of Kleff, provided you follow Section 4.
+
+3.3. Restricted Uses
+You may not:
+- Offer Kleff (or derivatives) as a paid or monetized hosted service without
+  express written permission from Kleff.
+- Represent your product or service as “official Kleff hosting.”
+- Use the Kleff brand or logo in a misleading or competitive way.
+
+3.4. Attribution
+You must include the following attribution in any distributed or modified copy:
+
+"This product includes software developed by Kleff (https://kleff.io).
+Licensed under the Kleff Public License v1.0, based on Apache 2.0."
+
+---------------------------------------------------------------------
+
+4. Distribution
+
+Redistribution of this software, modified or unmodified, must:
+- Include this License file.
+- Include clear attribution to Kleff.
+- State significant changes made, if any.
+
+---------------------------------------------------------------------
+
+5. Warranty Disclaimer
+
+This software is provided “as is,” without warranty of any kind, express or
+implied. In no event shall the authors or copyright holders be liable for any
+damages arising from its use.
+
+---------------------------------------------------------------------
+
+6. Trademarks
+
+"Kleff" and the Kleff logo are trademarks of Kleff. This license does not grant
+permission to use these marks for commercial purposes or in ways that imply
+endorsement.
+
+---------------------------------------------------------------------
+
+7. Contact
+
+To request permission for commercial hosted use or partnership opportunities,
+contact:
+Email: kleffioapp@gmail.com
+Website: https://kleff.io
+
+---------------------------------------------------------------------
+
+Build. Host. Scale. Your Way.
+© 2025 Kleff Hosting — Licensed under the Kleff Public License v1.0 (based on Apache 2.0)
