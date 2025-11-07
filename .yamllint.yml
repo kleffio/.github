@@ -1,42 +1,18 @@
 extends: default
 
-ignore: |
-  .git/**
-  LICENSES/**
-  node_modules/**
-  dist/**
-  build/**
-  coverage/**
-  .reuse/**
-  .github/ISSUE_TEMPLATE/**    # keep if you want to skip templates
-  .github/PULL_REQUEST_TEMPLATE/**
-
 rules:
-  document-start: disable
-  truthy: disable
-  comments: disable
-  comments-indentation: disable
-
+  line-length:
+    max: 120
+    level: warning
   indentation:
     spaces: 2
-    indent-sequences: false
-    check-multi-line-strings: false
-
-  line-length:
-    max: 160
-    allow-non-breakable-words: true
-    allow-non-breakable-inline-mappings: true
-
-  trailing-spaces: enable
-  new-line-at-end-of-file: enable
-  empty-lines:
-    max: 1
-    max-start: 0
-    max-end: 0
-
-  key-duplicates: enable
-  colons: enable
-  commas: enable
-  hyphens: enable
-  brackets: enable
-  braces: enable
+    indent-sequences: consistent
+  comments:
+    min-spaces-from-content: 1
+  document-start: disable
+  truthy:
+    allowed-values: ["true", "false", "on", "off"]
+  braces:
+    max-spaces-inside: 1
+  brackets:
+    max-spaces-inside: 1
