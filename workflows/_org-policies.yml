@@ -1,0 +1,40 @@
+name: Org Policies
+
+on:
+  workflow_call:
+    inputs:
+      run-on:
+        description: "Runner type"
+        required: false
+        default: ubuntu-latest
+
+jobs:
+  yamllint:
+    uses: kleffio/.github/workflows/_yaml-lint.yml@main
+    with:
+      run-on: ${{ inputs.run-on }}
+
+  markdownlint:
+    uses: kleffio/.github/workflows/_markdown-lint.yml@main
+    with:
+      run-on: ${{ inputs.run-on }}
+
+  actionlint:
+    uses: kleffio/.github/workflows/_actionlint.yml@main
+    with:
+      run-on: ${{ inputs.run-on }}
+
+  pr-title:
+    uses: kleffio/.github/workflows/_pr-title.yml@main
+    with:
+      run-on: ${{ inputs.run-on }}
+
+  require-label:
+    uses: kleffio/.github/workflows/_require-label.yml@main
+    with:
+      run-on: ${{ inputs.run-on }}
+
+  openssf:
+    uses: kleffio/.github/workflows/_openssf-scorecard.yml@main
+    with:
+      run-on: ${{ inputs.run-on }}
