@@ -21,8 +21,10 @@ If you discover a security vulnerability in any Kleff service, package, or deplo
 
 1. **Do not open a public issue.**  
    Responsible disclosure keeps the community safe.
-2. **Email:** [kleffioapp@gmail.com](mailto:kleffioapp@gmail.com)  
+2. **Email:** [kleffioapp@gmail.com](mailto:kleffioapp@gmail.com)
+
    Include:
+
    - A clear description of the issue and potential impact  
    - Steps to reproduce (if applicable)  
    - A suggested mitigation or patch (if available)
@@ -53,14 +55,12 @@ When running Kleff in production:
 ---
 
 **Contact:** [kleffioapp@gmail.com](mailto:kleffioapp@gmail.com)  
-**Website:** [https://kleff.io](https://kleff.io)
+**Website:** [kleff.io](https://kleff.io)
 
 ---
 
 <p align="center">
-  <b>Build. Host. Scale. Your Way.</b><br/>
-  <sub>Security is a shared responsibility — thank you for helping keep Kleff safe for everyone.</sub>
-  <br>
+  <b>Build. Host. Scale. Your Way.</b><br />
+  <sub>Security is a shared responsibility — thank you for helping keep Kleff safe for everyone.</sub><br />
   <sub>Licensed under the Kleff Public License v1.0 (based on Apache 2.0)</sub>
 </p>
-

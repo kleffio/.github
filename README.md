@@ -28,8 +28,8 @@ It contains shared documentation such as:
 
 GitHub automatically recognizes certain files inside `.github` to apply them across all repositories in the organization:
 
-- **Community Health Files** — Code of Conduct, Contributing, and Security apply globally.
-- **Profile Readme** — The `profile/README.md` is displayed publicly on the organization’s main page.
+- **Community Health Files** — Code of Conduct, Contributing, and Security apply globally.  
+- **Profile Readme** — The `profile/README.md` is displayed publicly on the organization’s main page.  
 - **Workflow Templates** *(future use)* — You can later add reusable GitHub Actions or Issue Templates here for all Kleff repos.
 
 ---
@@ -61,16 +61,15 @@ If you discover a security issue, please follow our [Security Policy](./SECURITY
 
 ---
 
-## 🛡️ License
+## 🧾 License
 
 This project is licensed under the **Kleff Public License v1.0 (based on Apache 2.0)** —  
-see the [LICENSE](https://github.com/kleffio/.github/blob/main/LICENSE) file for details.
+see the [LICENSE](./LICENSE) file for details.
 
 ---
 
 <p align="center">
-  <b>Build. Host. Scale. Your Way.</b><br/>
-  <sub>© 2025 Kleff Hosting — Open Source by <a href="https://github.com/isaacwallace123">Isaac Wallace</a></sub>
-  <br>
+  <b>Build. Host. Scale. Your Way.</b><br />
+  <sub>© 2025 Kleff Hosting — Open Source by <a href="https://github.com/isaacwallace123">Isaac Wallace</a></sub><br />
   <sub>Licensed under the Kleff Public License v1.0 (based on Apache 2.0)</sub>
 </p>
