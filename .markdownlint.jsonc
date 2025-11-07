@@ -8,5 +8,8 @@
   // Allow a few safe HTML tags we use in the org profile/README
   "MD033": {
     "allowed_elements": ["p", "img", "h1", "b", "br", "sub", "a"]
-  }
+  },
+
+  // Let asterisks be used for emphasis instead of underscores
+  "MD049": { "style": "asterisk" }
 }
