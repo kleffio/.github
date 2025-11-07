@@ -3,7 +3,7 @@
 Welcome to the **Kleff `.github` repository** —  
 the central home for our community policies, guidelines, and organization-wide documentation.
 
-> _Build. Host. Scale. Your Way._
+> *Build. Host. Scale. Your Way.*
 
 ---
 
