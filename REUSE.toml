@@ -4,5 +4,9 @@ version = 1
 path = [
   "**/*",
 ]
+exclude = [
+  ".github/workflows/**",
+  "LICENSES/**",
+]
 SPDX-FileCopyrightText = "2025 Kleff Hosting"
 SPDX-License-Identifier = "LicenseRef-Kleff-Public-License-1.0"
