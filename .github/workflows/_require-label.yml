@@ -1,18 +1,17 @@
 name: require-label
 on:
-  workflow_call:
-    inputs:
-      required:
-        type: string
-        required: false
-        default: "feature,bugfix,chore,docs,refactor,security,tests"
+  workflow_call: {}
+
+permissions:
+  contents: read
+  pull-requests: read
 
 jobs:
   check:
     runs-on: ubuntu-latest
     steps:
-      - uses: mheap/require-labels-action@v2
+      - uses: mheap/github-action-required-labels@v5
         with:
-          mode: minimum
+          mode: exactly
           count: 1
-          labels: ${{ inputs.required }}
+          labels: "feature, bugfix, chore, docs, security, tests, ci, dependencies"

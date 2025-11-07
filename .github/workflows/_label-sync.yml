@@ -13,6 +13,6 @@ jobs:
       - uses: actions/checkout@v4
       - uses: crazy-max/ghaction-github-labeler@v5
         with:
-          configuration-path: labels.yml
+          configuration-path: .github/labels.yml
           skip-delete: false
           dry-run: false

@@ -1,14 +1,30 @@
 name: shellcheck
-on: { workflow_call: {} }
+on:
+  workflow_call: {}
+
+permissions:
+  contents: read
+
 jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: |
+      - name: Check for shell scripts
+        id: check
+        run: |
           if compgen -G "**/*.sh" > /dev/null; then
-            sudo apt-get update && sudo apt-get install -y shellcheck
-            shellcheck **/*.sh
+            echo "found=true" >> $GITHUB_OUTPUT
           else
-            echo "No shell scripts found."
+            echo "found=false" >> $GITHUB_OUTPUT
           fi
+
+      - name: Install and run shellcheck
+        if: steps.check.outputs.found == 'true'
+        run: |
+          sudo apt-get update && sudo apt-get install -y shellcheck
+          shellcheck **/*.sh
+
+      - name: No scripts found
+        if: steps.check.outputs.found == 'false'
+        run: echo "No shell scripts found, skipping."

@@ -3,13 +3,15 @@ on:
   workflow_call: {}
   schedule:
     - cron: "0 6 * * 1"
+
+permissions:
+  contents: read
+  security-events: write
+  id-token: write
+
 jobs:
   analysis:
     runs-on: ubuntu-latest
-    permissions:
-      security-events: write
-      id-token: write
-      contents: read
     steps:
       - uses: ossf/scorecard-action@v2.3.3
         with:

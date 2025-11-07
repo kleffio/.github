@@ -1,10 +1,30 @@
 name: hadolint
-on: { workflow_call: {} }
+on:
+  workflow_call: {}
+
+permissions:
+  contents: read
+
 jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: hadolint/hadolint-action@v3.1.0
+      - name: Check for Dockerfiles
+        id: check
+        run: |
+          if compgen -G "**/Dockerfile*" > /dev/null; then
+            echo "found=true" >> $GITHUB_OUTPUT
+          else
+            echo "found=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Run hadolint
+        if: steps.check.outputs.found == 'true'
+        uses: hadolint/hadolint-action@v3.1.0
         with:
           recursive: true
+
+      - name: No Dockerfiles found
+        if: steps.check.outputs.found == 'false'
+        run: echo "No Dockerfiles found, skipping."
