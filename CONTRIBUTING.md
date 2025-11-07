@@ -85,4 +85,6 @@ Your feedback and ideas drive the future of Kleff 🚀
 <p align="center">
   <b>Build. Host. Scale. Your Way.</b><br/>
   <sub>Thank you for helping shape the Kleff ecosystem — every contribution matters.</sub>
+  <br>
+  <sub>Licensed under the Kleff Public License v1.0 (based on Apache 2.0)</sub>
 </p>

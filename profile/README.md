@@ -95,12 +95,15 @@ Your participation helps shape the future of Kleff 🚀
 
 ## 🛡️ License
 
-This project is licensed under the **MIT License** — see the [LICENSE](https://github.com/kleffio/.github/blob/main/LICENSE) file for details.
+This project is licensed under the **Kleff Public License v1.0 (based on Apache 2.0)** —  
+see the [LICENSE](https://github.com/kleffio/.github/blob/main/LICENSE) file for details.
 
 ---
 
 <p align="center">
   <sub>© 2025 Kleff Hosting — Open Source by <a href="https://github.com/isaacwallace123">Isaac Wallace</a></sub>
+  <br>
+  <sub>Licensed under the Kleff Public License v1.0 (based on Apache 2.0)</sub>
 </p>
 <p align="center">
   <img src="https://img.shields.io/badge/Built%20with-Go-blue?style=for-the-badge&logo=go" alt="Go"/>

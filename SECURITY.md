@@ -55,5 +55,12 @@ When running Kleff in production:
 **Contact:** [kleffioapp@gmail.com](mailto:kleffioapp@gmail.com)  
 **Website:** [https://kleff.io](https://kleff.io)
 
-> _Build. Host. Scale. Your Way._  
-> Security is a shared responsibility — thank you for helping keep Kleff safe for everyone.
+---
+
+<p align="center">
+  <b>Build. Host. Scale. Your Way.</b><br/>
+  <sub>Security is a shared responsibility — thank you for helping keep Kleff safe for everyone.</sub>
+  <br>
+  <sub>Licensed under the Kleff Public License v1.0 (based on Apache 2.0)</sub>
+</p>
+

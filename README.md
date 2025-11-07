@@ -61,14 +61,16 @@ If you discover a security issue, please follow our [Security Policy](./SECURITY
 
 ---
 
-## 📜 License
+## 🛡️ License
 
-All documentation and policy content in this repository are licensed under the **MIT License**.  
-See the [LICENSE](./LICENSE) file for details.
+This project is licensed under the **Kleff Public License v1.0 (based on Apache 2.0)** —  
+see the [LICENSE](https://github.com/kleffio/.github/blob/main/LICENSE) file for details.
 
 ---
 
 <p align="center">
   <b>Build. Host. Scale. Your Way.</b><br/>
   <sub>© 2025 Kleff Hosting — Open Source by <a href="https://github.com/isaacwallace123">Isaac Wallace</a></sub>
+  <br>
+  <sub>Licensed under the Kleff Public License v1.0 (based on Apache 2.0)</sub>
 </p>

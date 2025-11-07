@@ -67,4 +67,6 @@ We’re shaping a world where:
 <p align="center">
   <b>Build. Host. Scale. Your Way.</b><br/>
   <sub>© 2025 Kleff Hosting — Open Source by <a href="https://github.com/isaacwallace123">Isaac Wallace</a></sub>
+  <br>
+  <sub>Licensed under the Kleff Public License v1.0 (based on Apache 2.0)</sub>
 </p>
