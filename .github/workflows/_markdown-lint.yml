@@ -10,7 +10,7 @@ on:
         default: main
       config_path:
         type: string
-        default: .github/configs
+        default: configs
 
 jobs:
   markdownlint:
@@ -26,6 +26,9 @@ jobs:
           repository: ${{ inputs.config_repo }}
           ref: ${{ inputs.config_ref }}
           path: .github-org
+
+      - name: Debug (list central configs)
+        run: ls -laR .github-org/${{ inputs.config_path }}
 
       - name: Run Markdownlint
         uses: DavidAnson/markdownlint-cli2-action@v17
