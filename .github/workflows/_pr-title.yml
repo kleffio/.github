@@ -4,7 +4,7 @@ on:
     inputs:
       config_repo:         { type: string, default: kleffio/.github }
       config_ref:          { type: string, default: main }
-      labels_path:         { type: string, default: .github/labels.yml }
+      labels_path:         { type: string, default: configs/labels.yml }
       include_aliases:     { type: boolean, default: true }
 
 permissions:
