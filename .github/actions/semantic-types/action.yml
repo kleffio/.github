@@ -44,9 +44,11 @@ runs:
         echo "Using labels file: ${LABELS_FILE}"
         test -f "$LABELS_FILE" || { echo "::error::labels.json not found at ${LABELS_FILE}"; exit 2; }
 
+        export LABELS_FILE
+
         python - <<'PY' > types.txt
         import json, os, sys
-        p = os.environ.get("LABELS_FILE")
+        p = os.environ["LABELS_FILE"]
         with open(p, "r", encoding="utf-8") as f:
             data = json.load(f)
 
