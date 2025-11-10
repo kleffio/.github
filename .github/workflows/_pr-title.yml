@@ -1,12 +1,11 @@
-name: pr-title
+name: _pr-title
 on:
   workflow_call:
     inputs:
-      types:
-        description: "Allowed conventional types"
-        required: false
-        type: string
-        default: "feature,bugfix,chore,docs,refactor,security,tests"
+      config_repo:         { type: string, default: kleffio/.github }
+      config_ref:          { type: string, default: main }
+      labels_path:         { type: string, default: .github/labels.yml }
+      include_aliases:     { type: boolean, default: true }
 
 permissions:
   contents: read
@@ -16,10 +15,54 @@ jobs:
   check:
     runs-on: ubuntu-latest
     steps:
-      - uses: amannn/action-semantic-pull-request@v5
+      - name: Checkout caller
+        uses: actions/checkout@v4
+
+      - name: Checkout org configs
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ inputs.config_repo }}
+          ref: ${{ inputs.config_ref }}
+          path: .org-config
+
+      - name: Extract semantic types from labels.yml
+        id: types
+        shell: bash
+        run: |
+          set -euo pipefail
+          SRC=".org-config/${{ inputs.labels_path }}"
+          if [[ ! -f "$SRC" ]]; then
+            echo "ERROR: Labels file not found at $SRC"; ls -la .org-config || true; exit 1
+          fi
+
+          mapfile -t NAMES < <(grep -E '^- *name:' "$SRC" | sed -E 's/^- *name: *"?([^"]+)"?/\1/' | tr -d '\r')
+
+          TYPES=()
+          for n in "${NAMES[@]}"; do
+            [[ " ${TYPES[*]} " == *" $n "* ]] || TYPES+=("$n")
+          done
+
+          if [[ "${{ inputs.include_aliases }}" == "true" ]]; then
+            add_if_missing() { [[ " ${TYPES[*]} " == *" $1 "* ]] || TYPES+=("$1"); }
+            [[ " ${TYPES[*]} " == *" feature "*  ]] && add_if_missing "feat"
+            [[ " ${TYPES[*]} " == *" bugfix "*   ]] && add_if_missing "fix"
+            [[ " ${TYPES[*]} " == *" tests "*    ]] && add_if_missing "test"
+          fi
+
+          echo "Resolved types:"
+          printf ' - %s\n' "${TYPES[@]}"
+
+          {
+            echo "list<<EOF"
+            printf '%s\n' "${TYPES[@]}"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Validate PR title
+        uses: amannn/action-semantic-pull-request@v5
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          types: ${{ inputs.types }}
+          types: ${{ steps.types.outputs.list }}
           subjectPattern: "^[A-Z0-9].+"
           subjectPatternError: "Start the subject with a capital letter."
