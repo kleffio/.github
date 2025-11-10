@@ -1,4 +1,4 @@
-name: auto-label
+name: Auto Label CI
 on:
   workflow_call: {}
 
@@ -10,8 +10,17 @@ jobs:
   label:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/labeler@v5
+      - name: Checkout caller
+        uses: actions/checkout@v4
+
+      - name: Checkout org configs
+        uses: actions/checkout@v4
         with:
-          configuration-path: .github/labeler.yml
+          repository: kleffio/.github
+          path: .org-config
+
+      - name: Apply labels
+        uses: actions/labeler@v5
+        with:
+          configuration-path: .org-config/.github/labeler.yml
           repo-token: ${{ secrets.GITHUB_TOKEN }}
