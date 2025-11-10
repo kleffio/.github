@@ -19,16 +19,14 @@ jobs:
           repository: kleffio/.github
           path: .org-config
 
-      - name: Show org-config tree
+      - name: Stage org labeler config at default path
         run: |
-          pwd
-          ls -la .
-          ls -la .org-config
-          ls -la .org-config/.github
-          test -f .org-config/.github/labeler.yml && echo "labeler.yml FOUND" || (echo "labeler.yml MISSING" && exit 1)
+          mkdir -p .github
+          cp .org-config/.github/labeler.yml .github/labeler.yml
+          echo "Staged config:"
+          ls -la .github/labeler.yml
 
       - name: Apply labels
         uses: actions/labeler@v5
         with:
-          configuration-path: ".org-config/.github/labeler.yml"
           repo-token: ${{ secrets.GITHUB_TOKEN }}
