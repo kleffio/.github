@@ -22,6 +22,9 @@ outputs:
   types_csv:
     description: Comma-separated semantic types
     value: ${{ steps.mk.outputs.types_csv }}
+  types_lines:
+    description: Newline-separated semantic types
+    value: ${{ steps.mk.outputs.types_lines }}
   label_names_csv:
     description: Comma-separated label names
     value: ${{ steps.mk.outputs.label_names_csv }}
@@ -84,9 +87,9 @@ runs:
         labeler = {}
         for entry in labels:
             name = entry["name"]
-            rules = (entry.get("rules") or {})
-            changed = (rules.get("changed_files") or [])
-            branchp = (rules.get("branch_patterns") or [])
+            rules = entry.get("rules", {}) or {}
+            changed = rules.get("changed_files", []) or []
+            branchp = rules.get("branch_patterns", []) or []
             blocks = []
             if changed:
                 blocks.append({"changed-files": [{"any-glob-to-any-file": changed}]})
@@ -103,7 +106,7 @@ runs:
 
         types = []
         for e in labels:
-            for t in (e.get("semantic_types") or []):
+            for t in e.get("semantic_types", []) or []:
                 if t not in types:
                     types.append(t)
         names = [e["name"] for e in labels]
@@ -114,10 +117,12 @@ runs:
         with open(".generated/labels.json", "w", encoding="utf-8") as f:
             json.dump(sync, f, ensure_ascii=False, indent=2)
 
-        # outputs
-        with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as fh:
+        out = os.environ["GITHUB_OUTPUT"]
+        with open(out, "a", encoding="utf-8") as fh:
             print("labeler_path=.generated/labeler.yml", file=fh)
             print("labels_path=.generated/labels.json", file=fh)
             print("types_csv=" + ",".join(types), file=fh)
+            print("types_lines=" + "\\n".join(types), file=fh)
             print("label_names_csv=" + ",".join(names), file=fh)
         PY
+
