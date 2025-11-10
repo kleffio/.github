@@ -2,9 +2,9 @@ name: _require-label
 on:
   workflow_call:
     inputs:
-      config_repo: { type: string, default: kleffio/.github }
-      config_ref: { type: string, default: main }
-      unified_path: { type: string, default: configs/labels.yml }
+      config_repo:  { type: string, default: kleffio/.github }
+      config_ref:   { type: string, default: main }
+      unified_path: { type: string, default: configs/labels.json }
 
 permissions:
   contents: read
@@ -14,13 +14,21 @@ jobs:
   check:
     runs-on: ubuntu-latest
     steps:
-      - uses: kleffio/.github/.github/actions/labels-provisioning@main
+      - name: Load label policy from labels.json
         id: prep
+        uses: kleffio/.github/.github/actions/labels-provisioning@main
         with:
-          config_repo: ${{ inputs.config_repo }}
-          config_ref: ${{ inputs.config_ref }}
+          config_repo:  ${{ inputs.config_repo }}
+          config_ref:   ${{ inputs.config_ref }}
           unified_path: ${{ inputs.unified_path }}
 
-      - uses: kleffio/.github/.github/actions/require-label@main
+      - name: Guard — ensure required labels exist in config
+        if: ${{ steps.prep.outputs.label_names_csv == '' }}
+        run: |
+          echo "::error::No required labels found in labels.json (requireLabel.names)."
+          exit 1
+
+      - name: Enforce required labels
+        uses: kleffio/.github/.github/actions/require-label@main
         with:
           label_names_csv: ${{ steps.prep.outputs.label_names_csv }}

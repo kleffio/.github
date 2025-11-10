@@ -16,9 +16,9 @@ jobs:
         id: types
         uses: kleffio/.github/.github/actions/semantic-types@main
         with:
-          config_repo:  ${{ inputs.config_repo }}
-          config_ref:   ${{ inputs.config_ref }}
-          labels_path:  ${{ inputs.unified_path }}
+          config_repo: ${{ inputs.config_repo }}
+          config_ref: ${{ inputs.config_ref }}
+          labels_path: ${{ inputs.unified_path }}
 
       - name: Guard — ensure types present
         if: ${{ steps.types.outputs.allowed_types_nl == '' }}
@@ -31,7 +31,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          # IMPORTANT: newline-separated list
           types: ${{ steps.types.outputs.allowed_types_nl }}
           subjectPattern: "^[A-Z0-9].+"
           subjectPatternError: "Start the subject with a capital letter."
