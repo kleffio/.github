@@ -1,4 +1,4 @@
-name: Auto Label CI
+name: Auto Label (reusable)
 on:
   workflow_call: {}
 
@@ -19,8 +19,16 @@ jobs:
           repository: kleffio/.github
           path: .org-config
 
+      - name: Show org-config tree
+        run: |
+          pwd
+          ls -la .
+          ls -la .org-config
+          ls -la .org-config/.github
+          test -f .org-config/.github/labeler.yml && echo "labeler.yml FOUND" || (echo "labeler.yml MISSING" && exit 1)
+
       - name: Apply labels
         uses: actions/labeler@v5
         with:
-          configuration-path: .org-config/.github/labeler.yml
+          configuration-path: ".org-config/.github/labeler.yml"
           repo-token: ${{ secrets.GITHUB_TOKEN }}
