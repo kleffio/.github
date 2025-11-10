@@ -1,30 +1,42 @@
-name: _pr-title
+name: PR Title Check
 on:
   workflow_call:
     inputs:
-      config_repo: { type: string, default: kleffio/.github }
-      config_ref: { type: string, default: main }
-      unified_path: { type: string, default: configs/labels.yml }
-
-permissions:
-  contents: read
-  pull-requests: read
+      config_repo:
+        type: string
+        default: kleffio/.github
+      config_ref:
+        type: string
+        default: main
+      labels_path:
+        type: string
+        default: .org-config/configs/labels.json
 
 jobs:
   check:
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: read
     steps:
-      - uses: kleffio/.github/.github/actions/labels-provisioning@main
-        id: prep
+      - name: Load semantic types from labels.json
+        id: types
+        uses: kleffio/.github/.github/actions/semantic-types@main
         with:
           config_repo: ${{ inputs.config_repo }}
-          config_ref: ${{ inputs.config_ref }}
-          unified_path: ${{ inputs.unified_path }}
+          config_ref:  ${{ inputs.config_ref }}
+          labels_path: ${{ inputs.labels_path }}
 
-      - uses: amannn/action-semantic-pull-request@v5
+      - name: Guard — ensure types present
+        if: ${{ steps.types.outputs.allowed_types_csv == '' }}
+        run: |
+          echo "::error::No semantic types found in labels.json; cannot validate PR titles."
+          exit 1
+
+      - name: Validate PR title
+        uses: amannn/action-semantic-pull-request@v5
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          types: ${{ steps.prep.outputs.types_csv }}
+          types: ${{ steps.types.outputs.allowed_types_csv }}
           subjectPattern: "^[A-Z0-9].+"
           subjectPatternError: "Start the subject with a capital letter."

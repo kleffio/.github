@@ -1,0 +1,69 @@
+name: Extract Semantic Types
+description: Parse labels.json and emit allowed semantic types for PR title checks
+inputs:
+  config_repo:
+    description: Repo containing labels.json
+    default: kleffio/.github
+  config_ref:
+    description: Git ref (branch/sha) to read
+    default: main
+  labels_path:
+    description: Path to labels.json within the repo
+    default: .org-config/configs/labels.json
+
+outputs:
+  allowed_types_csv:
+    description: Comma-separated semantic types derived from labels.json
+    value: ${{ steps.emit.outputs.allowed_types_csv }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Checkout config repo
+      uses: actions/checkout@v4
+      with:
+        repository: ${{ inputs.config_repo }}
+        ref: ${{ inputs.config_ref }}
+        path: .org-config
+
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.11"
+
+    - name: Install deps
+      shell: bash
+      run: |
+        pip install --no-deps --disable-pip-version-check pyyaml
+
+    - name: Parse labels.json -> allowed_types_csv
+      id: emit
+      shell: bash
+      env:
+        LABELS_FILE: ${{ inputs.labels_path }}
+      run: |
+        set -euo pipefail
+        test -f "$LABELS_FILE" || { echo "::error::labels.json not found at $LABELS_FILE"; exit 2; }
+
+        python - <<'PY' > types.txt
+        import json, os, sys
+        p = os.environ["LABELS_FILE"]
+        with open(p, "r", encoding="utf-8") as f:
+            data = json.load(f)
+
+        labels = data.get("labels", [])
+        types = []
+        for lbl in labels:
+            t = lbl.get("semantic_types", [])
+            if isinstance(t, list):
+                types.extend([s for s in t if isinstance(s, str)])
+
+        norm = sorted(set(s.strip() for s in types if s and s.strip()))
+        if not norm:
+            print("labels.json contains no semantic_types", file=sys.stderr)
+            sys.exit(3)
+
+        print(",".join(norm))
+        PY
+
+        echo "allowed_types_csv=$(cat types.txt)" >> "$GITHUB_OUTPUT"
