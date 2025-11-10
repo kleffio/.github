@@ -1,6 +1,10 @@
-name: require-label
+name: _require-label
 on:
-  workflow_call: {}
+  workflow_call:
+    inputs:
+      config_repo: { type: string, default: kleffio/.github }
+      config_ref: { type: string, default: main }
+      unified_path: { type: string, default: configs/labels.yml }
 
 permissions:
   contents: read
@@ -10,8 +14,13 @@ jobs:
   check:
     runs-on: ubuntu-latest
     steps:
-      - uses: mheap/github-action-required-labels@v5
+      - uses: ./.github/actions/labels-prepare
+        id: prep
         with:
-          mode: exactly
-          count: 1
-          labels: "feature, bugfix, chore, docs, security, tests, ci, dependencies"
+          config_repo: ${{ inputs.config_repo }}
+          config_ref: ${{ inputs.config_ref }}
+          unified_path: ${{ inputs.unified_path }}
+
+      - uses: ./.github/actions/require-label
+        with:
+          label_names_csv: ${{ steps.prep.outputs.label_names_csv }}

@@ -1,0 +1,180 @@
+name: 'Process Unified Labels'
+description: 'Parse unified labels.yml and generate format-specific configs (labeler, semantic types, etc.)'
+author: 'kleffio'
+
+inputs:
+  source_file:
+    description: 'Path to unified labels.yml file'
+    required: false
+    default: '.org-config/configs/labels.yml'
+  output_dir:
+    description: 'Directory to output generated configs'
+    required: false
+    default: '.github'
+
+outputs:
+  labeler_config:
+    description: 'Path to generated labeler config'
+    value: ${{ steps.generate.outputs.labeler_config }}
+  sync_config:
+    description: 'Path to generated label-sync config'
+    value: ${{ steps.generate.outputs.sync_config }}
+  semantic_types:
+    description: 'Comma-separated list of semantic types'
+    value: ${{ steps.generate.outputs.semantic_types }}
+
+runs:
+  using: composite
+  steps:
+    - name: Validate source file
+      shell: bash
+      run: |
+        echo "::group::Validating unified labels configuration"
+        if [ ! -f "${{ inputs.source_file }}" ]; then
+          echo "::error::Unified labels file not found: ${{ inputs.source_file }}"
+          exit 1
+        fi
+        echo "✓ Found unified labels file"
+        echo "::endgroup::"
+
+    - name: Generate format-specific configs
+      id: generate
+      shell: bash
+      run: |
+        set -euo pipefail
+        
+        echo "::group::Processing unified labels configuration"
+        
+        SOURCE="${{ inputs.source_file }}"
+        OUTPUT_DIR="${{ inputs.output_dir }}"
+        
+        mkdir -p "${OUTPUT_DIR}"
+        
+        # Output files
+        LABELER_CONFIG="${OUTPUT_DIR}/labeler.yml"
+        SYNC_CONFIG="${OUTPUT_DIR}/labels-sync.yml"
+        
+        echo "Generating configs from: ${SOURCE}"
+        echo "Output directory: ${OUTPUT_DIR}"
+        
+        # Parse YAML and generate labeler.yml format
+        python3 << 'PYEOF'
+        import yaml
+        import sys
+        import os
+        
+        source = "${{ inputs.source_file }}"
+        labeler_out = "${LABELER_CONFIG}"
+        sync_out = "${SYNC_CONFIG}"
+        
+        try:
+            with open(source, 'r') as f:
+                config = yaml.safe_load(f)
+            
+            if not config or 'labels' not in config:
+                print("::error::Invalid unified labels file: missing 'labels' key")
+                sys.exit(1)
+            
+            labels = config['labels']
+            
+            # Generate labeler.yml (auto-label format)
+            labeler_config = {}
+            semantic_types = []
+            
+            for label in labels:
+                name = label['name']
+                rules = label.get('rules', {})
+                
+                if not rules:
+                    continue
+                
+                label_rules = []
+                
+                # Changed files rules
+                if 'changed_files' in rules:
+                    label_rules.append({
+                        'changed-files': [{
+                            'any-glob-to-any-file': rules['changed_files']
+                        }]
+                    })
+                
+                # Branch pattern rules
+                if 'branch_patterns' in rules:
+                    label_rules.append({
+                        'head-branch': rules['branch_patterns']
+                    })
+                
+                if label_rules:
+                    labeler_config[name] = label_rules
+                
+                # Collect semantic types
+                if 'semantic_types' in label:
+                    semantic_types.extend(label['semantic_types'])
+            
+            # Write labeler config
+            with open(labeler_out, 'w') as f:
+                yaml.dump(labeler_config, f, default_flow_style=False, sort_keys=False)
+            
+            print(f"✓ Generated labeler config: {labeler_out}")
+            
+            # Generate label-sync format (github-labeler format)
+            sync_labels = []
+            for label in labels:
+                sync_label = {
+                    'name': label['name'],
+                    'color': label['color'],
+                    'description': label.get('description', '')
+                }
+                sync_labels.append(sync_label)
+            
+            with open(sync_out, 'w') as f:
+                yaml.dump(sync_labels, f, default_flow_style=False, sort_keys=False)
+            
+            print(f"✓ Generated label-sync config: {sync_out}")
+            
+            # Output semantic types
+            types_str = ','.join(sorted(set(semantic_types)))
+            print(f"✓ Semantic types: {types_str}")
+            
+            # Write to GitHub output
+            with open(os.environ['GITHUB_OUTPUT'], 'a') as f:
+                f.write(f"labeler_config={labeler_out}\n")
+                f.write(f"sync_config={sync_out}\n")
+                f.write(f"semantic_types={types_str}\n")
+            
+        except Exception as e:
+            print(f"::error::Failed to process labels: {e}")
+            sys.exit(1)
+        PYEOF
+        
+        echo ""
+        echo "----- Generated labeler.yml -----"
+        cat "${LABELER_CONFIG}" || true
+        echo ""
+        echo "----- Generated labels-sync.yml -----"
+        cat "${SYNC_CONFIG}" || true
+        echo ""
+        
+        echo "::endgroup::"
+        echo "::notice::Successfully generated label configs from unified source"
+
+    - name: Validate generated configs
+      shell: bash
+      run: |
+        echo "::group::Validating generated configurations"
+        
+        LABELER="${{ steps.generate.outputs.labeler_config }}"
+        SYNC="${{ steps.generate.outputs.sync_config }}"
+        
+        if [ ! -f "${LABELER}" ]; then
+          echo "::error::Failed to generate labeler config"
+          exit 1
+        fi
+        
+        if [ ! -f "${SYNC}" ]; then
+          echo "::error::Failed to generate label-sync config"
+          exit 1
+        fi
+        
+        echo "✓ All configs generated successfully"
+        echo "::endgroup::"

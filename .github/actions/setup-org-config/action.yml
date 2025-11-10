@@ -1,0 +1,88 @@
+name: 'Setup Organization Config'
+description: 'Checkout and provision organization-wide configuration files'
+author: 'kleffio'
+
+inputs:
+  config_repo:
+    description: 'Organization config repository (e.g., kleffio/.github)'
+    required: false
+    default: 'kleffio/.github'
+  config_ref:
+    description: 'Branch or tag to checkout from config repo'
+    required: false
+    default: 'main'
+  checkout_path:
+    description: 'Path to checkout config repo to'
+    required: false
+    default: '.org-config'
+  github_token:
+    description: 'GitHub token for private repo access (if needed)'
+    required: false
+    default: ${{ github.token }}
+
+outputs:
+  config_path:
+    description: 'Absolute path to the checked out config directory'
+    value: ${{ steps.setup.outputs.config_path }}
+  configs_dir:
+    description: 'Path to the configs subdirectory'
+    value: ${{ steps.setup.outputs.configs_dir }}
+
+runs:
+  using: composite
+  steps:
+    - name: Validate inputs
+      shell: bash
+      run: |
+        echo "::group::Validating setup-org-config inputs"
+        echo "Config repository: ${{ inputs.config_repo }}"
+        echo "Config reference: ${{ inputs.config_ref }}"
+        echo "Checkout path: ${{ inputs.checkout_path }}"
+        echo "::endgroup::"
+
+    - name: Checkout organization config repository
+      uses: actions/checkout@v4
+      with:
+        repository: ${{ inputs.config_repo }}
+        ref: ${{ inputs.config_ref }}
+        path: ${{ inputs.checkout_path }}
+        token: ${{ inputs.github_token }}
+
+    - name: Verify config structure
+      id: setup
+      shell: bash
+      run: |
+        set -euo pipefail
+        
+        echo "::group::Verifying organization config structure"
+        
+        CONFIG_PATH="${{ github.workspace }}/${{ inputs.checkout_path }}"
+        CONFIGS_DIR="${CONFIG_PATH}/configs"
+        
+        echo "Config path: ${CONFIG_PATH}"
+        echo "Configs directory: ${CONFIGS_DIR}"
+        
+        if [ ! -d "${CONFIG_PATH}" ]; then
+          echo "::error::Config directory not found at ${CONFIG_PATH}"
+          exit 1
+        fi
+        
+        echo "✓ Config directory exists"
+        
+        if [ -d "${CONFIGS_DIR}" ]; then
+          echo "✓ Configs subdirectory found"
+          echo "Available config files:"
+          ls -la "${CONFIGS_DIR}" || true
+        else
+          echo "::warning::No configs/ subdirectory found"
+        fi
+        
+        echo "config_path=${CONFIG_PATH}" >> $GITHUB_OUTPUT
+        echo "configs_dir=${CONFIGS_DIR}" >> $GITHUB_OUTPUT
+        
+        echo "::endgroup::"
+
+    - name: Setup complete
+      shell: bash
+      run: |
+        echo "::notice::Organization config successfully provisioned from ${{ inputs.config_repo }}@${{ inputs.config_ref }}"

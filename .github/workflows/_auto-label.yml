@@ -1,10 +1,10 @@
-name: Auto Label CI
+name: _auto-label
 on:
   workflow_call:
     inputs:
-      config_repo:        { type: string, default: kleffio/.github }
-      config_ref:         { type: string, default: main }
-      stage_to_path:      { type: string, default: .github/labeler.yml }
+      config_repo: { type: string, default: kleffio/.github }
+      config_ref: { type: string, default: main }
+      unified_path: { type: string, default: configs/labels.yml }
 
 permissions:
   contents: read
@@ -14,35 +14,15 @@ jobs:
   label:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout caller
-        uses: actions/checkout@v4
-
-      - name: Checkout org configs
-        uses: actions/checkout@v4
+      - uses: ./.github/actions/labels-prepare
+        id: prep
         with:
-          repository: ${{ inputs.config_repo }}
-          ref: ${{ inputs.config_ref }}
-          path: .org-config
-
-      - name: Provision Labeler config (ephemeral)
-        shell: bash
-        run: |
-          set -euo pipefail
-          SRC=".org-config/${{ inputs.stage_to_path }}"
-          DST="${{ inputs.stage_to_path }}"
-
-          echo "Looking for labeler config at: ${SRC}"
-          test -f "${SRC}" || { echo "ERROR: ${SRC} not found"; exit 1; }
-
-          mkdir -p "$(dirname "${DST}")"
-          install -m 0644 "${SRC}" "${DST}"
-
-          echo "Staged labeler config to: ${DST}"
-          echo "----- BEGIN ${DST} (first 120 lines) -----"
-          sed -n '1,120p' "${DST}" || true
-          echo "----- END ${DST} -----"
+          config_repo: ${{ inputs.config_repo }}
+          config_ref: ${{ inputs.config_ref }}
+          unified_path: ${{ inputs.unified_path }}
 
       - name: Apply labels
         uses: actions/labeler@v5
         with:
+          configuration-path: ${{ steps.prep.outputs.labeler_path }}
           repo-token: ${{ secrets.GITHUB_TOKEN }}
