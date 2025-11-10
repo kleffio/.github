@@ -22,7 +22,7 @@ jobs:
           unified_path: ${{ inputs.unified_path }}
 
       - name: Apply labels
-        uses: actions/labeler@v5
+        uses: actions/labeler@v6
         with:
           configuration-path: ${{ steps.prep.outputs.labeler_path }}
           repo-token: ${{ secrets.GITHUB_TOKEN }}
