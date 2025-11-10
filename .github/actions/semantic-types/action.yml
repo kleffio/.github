@@ -7,9 +7,9 @@ inputs:
   config_ref:
     description: Git ref (branch/sha) to read
     default: main
-  unified_path:
-    description: Path to labels.json within the repo
-    default: .org-config/configs/labels.json
+  labels_path:
+    description: Path to labels.json within the repo (e.g., configs/labels.json)
+    default: configs/labels.json
 
 outputs:
   allowed_types_csv:
@@ -26,28 +26,27 @@ runs:
         ref: ${{ inputs.config_ref }}
         path: .org-config
 
-    - name: Setup Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: "3.11"
-
-    - name: Install deps
-      shell: bash
-      run: |
-        pip install --no-deps --disable-pip-version-check pyyaml
-
     - name: Parse labels.json -> allowed_types_csv
       id: emit
       shell: bash
       env:
-        LABELS_FILE: ${{ inputs.unified_path }}
+        INPUT_PATH: ${{ inputs.labels_path }}
       run: |
         set -euo pipefail
-        test -f "$LABELS_FILE" || { echo "::error::labels.json not found at $LABELS_FILE"; exit 2; }
+
+        # Resolve relative paths under .org-config
+        if [[ "${INPUT_PATH}" = /* ]]; then
+          LABELS_FILE="${INPUT_PATH}"
+        else
+          LABELS_FILE=".org-config/${INPUT_PATH}"
+        fi
+
+        echo "Using labels file: ${LABELS_FILE}"
+        test -f "$LABELS_FILE" || { echo "::error::labels.json not found at ${LABELS_FILE}"; exit 2; }
 
         python - <<'PY' > types.txt
         import json, os, sys
-        p = os.environ["LABELS_FILE"]
+        p = os.environ.get("LABELS_FILE")
         with open(p, "r", encoding="utf-8") as f:
             data = json.load(f)
 
