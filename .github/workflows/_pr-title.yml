@@ -2,15 +2,9 @@ name: PR Title Check
 on:
   workflow_call:
     inputs:
-      config_repo:
-        type: string
-        default: kleffio/.github
-      config_ref:
-        type: string
-        default: main
-      labels_path:
-        type: string
-        default: .org-config/configs/labels.json
+      config_repo: { type: string, default: kleffio/.github }
+      config_ref: { type: string, default: main }
+      unified_path: { type: string, default: configs/labels.yml }
 
 jobs:
   check:
@@ -24,7 +18,7 @@ jobs:
         with:
           config_repo: ${{ inputs.config_repo }}
           config_ref:  ${{ inputs.config_ref }}
-          labels_path: ${{ inputs.labels_path }}
+          unified_path: ${{ inputs.unified_path }}
 
       - name: Guard — ensure types present
         if: ${{ steps.types.outputs.allowed_types_csv == '' }}

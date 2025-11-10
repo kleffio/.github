@@ -7,7 +7,7 @@ inputs:
   config_ref:
     description: Git ref (branch/sha) to read
     default: main
-  labels_path:
+  unified_path:
     description: Path to labels.json within the repo
     default: .org-config/configs/labels.json
 
@@ -40,7 +40,7 @@ runs:
       id: emit
       shell: bash
       env:
-        LABELS_FILE: ${{ inputs.labels_path }}
+        LABELS_FILE: ${{ inputs.unified_path }}
       run: |
         set -euo pipefail
         test -f "$LABELS_FILE" || { echo "::error::labels.json not found at $LABELS_FILE"; exit 2; }
