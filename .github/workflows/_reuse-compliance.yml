@@ -36,6 +36,6 @@ jobs:
           echo "Provisioned REUSE files for lint run."
 
       - name: REUSE Compliance
-        uses: fsfe/reuse-action@v3
+        uses: fsfe/reuse-action@v6
         with:
           args: --include-submodules
