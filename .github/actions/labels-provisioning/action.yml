@@ -71,10 +71,11 @@ runs:
       run: |
         set -euo pipefail
         python - <<'PY'
-        import os, sys, yaml
-        src = ".generated/kleff-labels.yml"
+        import os, sys, json, yaml
+
+        src = ".generated/kleff-labels.json"
         with open(src, "r", encoding="utf-8") as f:
-            data = yaml.safe_load(f)
+            data = json.load(f)
 
         labels = data.get("labels", [])
         if not isinstance(labels, list) or not labels:
@@ -84,10 +85,9 @@ runs:
         labeler = {}
         for entry in labels:
             name = entry["name"]
-            rules = entry.get("rules", {})
+            rules = entry.get("rules", {}) or {}
             changed = rules.get("changed_files", []) or []
             branchp = rules.get("branch_patterns", []) or []
-
             blocks = []
             if changed:
                 blocks.append({"changed-files": [{"any-glob-to-any-file": changed}]})
@@ -98,28 +98,27 @@ runs:
 
         sync = [{
             "name": e["name"],
-            "color": str(e.get("color","")).strip().lstrip("#"),
-            "description": e.get("description","") or ""
+            "color": str(e.get("color", "")).strip().lstrip("#"),
+            "description": e.get("description", "")
         } for e in labels]
 
         types = []
         for e in labels:
-            for t in (e.get("semantic_types") or []):
-                if t not in types:
-                    types.append(t)
-
+            for t in e.get("semantic_types", []) or []:
+                if t not in types: types.append(t)
         names = [e["name"] for e in labels]
 
         os.makedirs(".generated", exist_ok=True)
-        with open(".generated/labeler.yml","w", encoding="utf-8") as f:
+        with open(".generated/labeler.yml", "w", encoding="utf-8") as f:
             yaml.safe_dump(labeler, f, sort_keys=False, allow_unicode=True)
-        with open(".generated/labels.yml","w", encoding="utf-8") as f:
-            yaml.safe_dump(sync, f, sort_keys=False, allow_unicode=True)
+        with open(".generated/labels.json", "w", encoding="utf-8") as f:
+            json.dump(sync, f, ensure_ascii=False, indent=2)
 
         out = os.environ["GITHUB_OUTPUT"]
         with open(out, "a", encoding="utf-8") as fh:
             print("labeler_path=.generated/labeler.yml", file=fh)
-            print("labels_path=.generated/labels.yml", file=fh)
+            print("labels_path=.generated/labels.json", file=fh)
             print("types_csv=" + ",".join(types), file=fh)
             print("label_names_csv=" + ",".join(names), file=fh)
         PY
+
