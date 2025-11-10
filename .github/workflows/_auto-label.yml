@@ -1,6 +1,10 @@
-name: Auto Label (reusable)
+name: Auto Label CI
 on:
-  workflow_call: {}
+  workflow_call:
+    inputs:
+      config_repo:        { type: string, default: kleffio/.github }
+      config_ref:         { type: string, default: main }
+      stage_to_path:      { type: string, default: .github/labeler.yml }
 
 permissions:
   contents: read
@@ -16,37 +20,27 @@ jobs:
       - name: Checkout org configs
         uses: actions/checkout@v4
         with:
-          repository: kleffio/.github
+          repository: ${{ inputs.config_repo }}
+          ref: ${{ inputs.config_ref }}
           path: .org-config
 
-      - name: Verify org labeler path and stage config
+      - name: Provision Labeler config (ephemeral)
         shell: bash
         run: |
           set -euo pipefail
-          echo "::group::List .org-config"
-          ls -la .
-          ls -la .org-config || true
-          ls -la .org-config/.github || true
-          echo "::endgroup::"
+          SRC=".org-config/${{ inputs.stage_to_path }}"
+          DST="${{ inputs.stage_to_path }}"
 
-          # Adjust this SOURCE if needed (see notes below)
-          SRC=".org-config/.github/labeler.yml"
+          echo "Looking for labeler config at: ${SRC}"
+          test -f "${SRC}" || { echo "ERROR: ${SRC} not found"; exit 1; }
 
-          if [[ ! -f "$SRC" ]]; then
-            echo "ERROR: Expected org-wide labeler.yml at '$SRC' but it does not exist."
-            echo "If your file lives elsewhere (e.g. .org-config/labeler.yml or .org-config/configs/labeler.yml), update 'SRC' accordingly."
-            exit 1
-          fi
+          mkdir -p "$(dirname "${DST}")"
+          install -m 0644 "${SRC}" "${DST}"
 
-          mkdir -p .github
-          install -m 0644 "$SRC" .github/labeler.yml
-
-          echo "::group::Staged file details"
-          ls -la .github/labeler.yml
-          echo "----- BEGIN .github/labeler.yml -----"
-          sed -n '1,80p' .github/labeler.yml
-          echo "----- END .github/labeler.yml -----"
-          echo "::endgroup::"
+          echo "Staged labeler config to: ${DST}"
+          echo "----- BEGIN ${DST} (first 120 lines) -----"
+          sed -n '1,120p' "${DST}" || true
+          echo "----- END ${DST} -----"
 
       - name: Apply labels
         uses: actions/labeler@v5
