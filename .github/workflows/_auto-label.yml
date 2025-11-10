@@ -14,7 +14,7 @@ jobs:
   label:
     runs-on: ubuntu-latest
     steps:
-      - uses: kleffio/.github/.github/actions/labels-prepare@main
+      - uses: kleffio/.github/.github/actions/labels-provisioning@main
         id: prep
         with:
           config_repo: ${{ inputs.config_repo }}
