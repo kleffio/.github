@@ -1,5 +1,5 @@
 name: Kleff Labels Provisioning
-description: Parse unified kleff-labels.yml into labeler.yml + labels.yml and expose semantic types
+description: Parse unified kleff-labels.json into labeler.yml + labels.json and expose semantic types
 
 inputs:
   config_repo:
@@ -9,8 +9,8 @@ inputs:
     description: Branch/commit for config_repo
     default: main
   unified_path:
-    description: Path to the unified labels file
-    default: configs/labels.yml
+    description: Path to the unified labels JSON file
+    default: configs/labels.json
 
 outputs:
   labeler_path:
@@ -55,11 +55,10 @@ runs:
         mkdir -p .generated
         if [ -f "${{ inputs.unified_path }}" ]; then
           echo "Using repo-local ${{ inputs.unified_path }}"
-          cp "${{ inputs.unified_path }}" .generated/kleff-labels.yml
+          cp "${{ inputs.unified_path }}" .generated/kleff-labels.json
         elif [ -f ".org-config/${{ inputs.unified_path }}" ]; then
           echo "Using org fallback .org-config/${{ inputs.unified_path }}"
-          mkdir -p "$(dirname "${{ inputs.unified_path }}")"
-          cp ".org-config/${{ inputs.unified_path }}" .generated/kleff-labels.yml
+          cp ".org-config/${{ inputs.unified_path }}" .generated/kleff-labels.json
         else
           echo "::error::Unified labels file not found at ${{ inputs.unified_path }} (repo) or in org fallback."
           exit 1
@@ -85,9 +84,9 @@ runs:
         labeler = {}
         for entry in labels:
             name = entry["name"]
-            rules = entry.get("rules", {}) or {}
-            changed = rules.get("changed_files", []) or []
-            branchp = rules.get("branch_patterns", []) or []
+            rules = (entry.get("rules") or {})
+            changed = (rules.get("changed_files") or [])
+            branchp = (rules.get("branch_patterns") or [])
             blocks = []
             if changed:
                 blocks.append({"changed-files": [{"any-glob-to-any-file": changed}]})
@@ -104,8 +103,9 @@ runs:
 
         types = []
         for e in labels:
-            for t in e.get("semantic_types", []) or []:
-                if t not in types: types.append(t)
+            for t in (e.get("semantic_types") or []):
+                if t not in types:
+                    types.append(t)
         names = [e["name"] for e in labels]
 
         os.makedirs(".generated", exist_ok=True)
@@ -114,11 +114,10 @@ runs:
         with open(".generated/labels.json", "w", encoding="utf-8") as f:
             json.dump(sync, f, ensure_ascii=False, indent=2)
 
-        out = os.environ["GITHUB_OUTPUT"]
-        with open(out, "a", encoding="utf-8") as fh:
+        # outputs
+        with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as fh:
             print("labeler_path=.generated/labeler.yml", file=fh)
             print("labels_path=.generated/labels.json", file=fh)
             print("types_csv=" + ",".join(types), file=fh)
             print("label_names_csv=" + ",".join(names), file=fh)
         PY
-
