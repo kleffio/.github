@@ -1,5 +1,5 @@
-name: Kleff Labels Prepare
-description: Parse unified labels.yml into labeler.yml + labels.yml and expose semantic types
+name: Kleff Labels Provisioning
+description: Parse unified kleff-labels.yml into labeler.yml + labels.yml and expose semantic types
 
 inputs:
   config_repo:
@@ -39,6 +39,15 @@ runs:
         ref: ${{ inputs.config_ref }}
         path: .org-config
 
+    - name: Set up Python (for PyYAML)
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.x'
+
+    - name: Install PyYAML
+      shell: bash
+      run: pip install --no-deps --disable-pip-version-check pyyaml
+
     - name: Ensure unified file present
       shell: bash
       run: |
@@ -49,6 +58,7 @@ runs:
           cp "${{ inputs.unified_path }}" .generated/kleff-labels.yml
         elif [ -f ".org-config/${{ inputs.unified_path }}" ]; then
           echo "Using org fallback .org-config/${{ inputs.unified_path }}"
+          mkdir -p "$(dirname "${{ inputs.unified_path }}")"
           cp ".org-config/${{ inputs.unified_path }}" .generated/kleff-labels.yml
         else
           echo "::error::Unified labels file not found at ${{ inputs.unified_path }} (repo) or in org fallback."
@@ -60,62 +70,56 @@ runs:
       shell: bash
       run: |
         set -euo pipefail
-        python3 - <<'PY'
+        python - <<'PY'
         import os, sys, yaml
-
-        SRC = ".generated/kleff-labels.yml"
-        with open(SRC, "r", encoding="utf-8") as f:
-          data = yaml.safe_load(f)
+        src = ".generated/kleff-labels.yml"
+        with open(src, "r", encoding="utf-8") as f:
+            data = yaml.safe_load(f)
 
         labels = data.get("labels", [])
         if not isinstance(labels, list) or not labels:
-          print("::error::No 'labels' array found in unified file.", file=sys.stderr)
-          sys.exit(1)
+            print("::error::No 'labels' array found in unified file.", file=sys.stderr)
+            sys.exit(1)
 
         labeler = {}
-        for e in labels:
-          name = e["name"]
-          rules = e.get("rules", {})
-          changed = rules.get("changed_files", [])
-          branchp = rules.get("branch_patterns", [])
+        for entry in labels:
+            name = entry["name"]
+            rules = entry.get("rules", {})
+            changed = rules.get("changed_files", []) or []
+            branchp = rules.get("branch_patterns", []) or []
 
-          blocks = []
-          if changed:
-            blocks.append({"changed-files": [{"any-glob-to-any-file": changed}]})
-          if branchp:
-            blocks.append({"head-branch": branchp})
-          if blocks:
-            labeler[name] = blocks
+            blocks = []
+            if changed:
+                blocks.append({"changed-files": [{"any-glob-to-any-file": changed}]})
+            if branchp:
+                blocks.append({"head-branch": branchp})
+            if blocks:
+                labeler[name] = blocks
 
-        sync = []
-        for e in labels:
-          color = str(e.get("color", "") or "")
-          # normalize to lowercase hex without '#'
-          color = color.lstrip("#").lower()
-          sync.append({
+        sync = [{
             "name": e["name"],
-            "color": color,
-            "description": e.get("description", "") or ""
-          })
+            "color": str(e.get("color","")).strip().lstrip("#"),
+            "description": e.get("description","") or ""
+        } for e in labels]
 
         types = []
         for e in labels:
-          for t in (e.get("semantic_types") or []):
-            if t not in types: types.append(t)
+            for t in (e.get("semantic_types") or []):
+                if t not in types:
+                    types.append(t)
+
         names = [e["name"] for e in labels]
 
         os.makedirs(".generated", exist_ok=True)
-
         with open(".generated/labeler.yml","w", encoding="utf-8") as f:
-          yaml.safe_dump(labeler, f, sort_keys=False, allow_unicode=True)
-
+            yaml.safe_dump(labeler, f, sort_keys=False, allow_unicode=True)
         with open(".generated/labels.yml","w", encoding="utf-8") as f:
-          yaml.safe_dump(sync, f, sort_keys=False, allow_unicode=True, default_style='"')
+            yaml.safe_dump(sync, f, sort_keys=False, allow_unicode=True)
 
         out = os.environ["GITHUB_OUTPUT"]
-        with open(out, "a", encoding="utf-8") as gh:
-          gh.write(f"labeler_path=.generated/labeler.yml\n")
-          gh.write(f"labels_path=.generated/labels.yml\n")
-          gh.write(f"types_csv={','.join(types)}\n")
-          gh.write(f"label_names_csv={','.join(names)}\n")
+        with open(out, "a", encoding="utf-8") as fh:
+            print("labeler_path=.generated/labeler.yml", file=fh)
+            print("labels_path=.generated/labels.yml", file=fh)
+            print("types_csv=" + ",".join(types), file=fh)
+            print("label_names_csv=" + ",".join(names), file=fh)
         PY
