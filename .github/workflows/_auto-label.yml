@@ -19,12 +19,34 @@ jobs:
           repository: kleffio/.github
           path: .org-config
 
-      - name: Stage org labeler config at default path
+      - name: Verify org labeler path and stage config
+        shell: bash
         run: |
+          set -euo pipefail
+          echo "::group::List .org-config"
+          ls -la .
+          ls -la .org-config || true
+          ls -la .org-config/.github || true
+          echo "::endgroup::"
+
+          # Adjust this SOURCE if needed (see notes below)
+          SRC=".org-config/.github/labeler.yml"
+
+          if [[ ! -f "$SRC" ]]; then
+            echo "ERROR: Expected org-wide labeler.yml at '$SRC' but it does not exist."
+            echo "If your file lives elsewhere (e.g. .org-config/labeler.yml or .org-config/configs/labeler.yml), update 'SRC' accordingly."
+            exit 1
+          fi
+
           mkdir -p .github
-          cp .org-config/.github/labeler.yml .github/labeler.yml
-          echo "Staged config:"
+          install -m 0644 "$SRC" .github/labeler.yml
+
+          echo "::group::Staged file details"
           ls -la .github/labeler.yml
+          echo "----- BEGIN .github/labeler.yml -----"
+          sed -n '1,80p' .github/labeler.yml
+          echo "----- END .github/labeler.yml -----"
+          echo "::endgroup::"
 
       - name: Apply labels
         uses: actions/labeler@v5
