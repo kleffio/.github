@@ -4,7 +4,7 @@ on:
     inputs:
       config_repo: { type: string, default: kleffio/.github }
       config_ref: { type: string, default: main }
-      unified_path: { type: string, default: configs/labels.yml }
+      unified_path: { type: string, default: configs/labels.json }
 
 jobs:
   check:
@@ -16,12 +16,12 @@ jobs:
         id: types
         uses: kleffio/.github/.github/actions/semantic-types@main
         with:
-          config_repo: ${{ inputs.config_repo }}
-          config_ref:  ${{ inputs.config_ref }}
-          labels_path: ${{ inputs.unified_path }}
+          config_repo:  ${{ inputs.config_repo }}
+          config_ref:   ${{ inputs.config_ref }}
+          labels_path:  ${{ inputs.unified_path }}
 
       - name: Guard — ensure types present
-        if: ${{ steps.types.outputs.allowed_types_csv == '' }}
+        if: ${{ steps.types.outputs.allowed_types_nl == '' }}
         run: |
           echo "::error::No semantic types found in labels.json; cannot validate PR titles."
           exit 1
@@ -31,6 +31,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          types: ${{ steps.types.outputs.allowed_types_csv }}
+          # IMPORTANT: newline-separated list
+          types: ${{ steps.types.outputs.allowed_types_nl }}
           subjectPattern: "^[A-Z0-9].+"
           subjectPatternError: "Start the subject with a capital letter."

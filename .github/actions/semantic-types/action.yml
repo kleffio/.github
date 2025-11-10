@@ -12,9 +12,9 @@ inputs:
     default: configs/labels.json
 
 outputs:
-  allowed_types_csv:
-    description: Comma-separated semantic types derived from labels.json
-    value: ${{ steps.emit.outputs.allowed_types_csv }}
+  allowed_types_nl:
+    description: Newline-separated semantic types derived from labels.json
+    value: ${{ steps.emit.outputs.allowed_types_nl }}
 
 runs:
   using: "composite"
@@ -26,7 +26,7 @@ runs:
         ref: ${{ inputs.config_ref }}
         path: .org-config
 
-    - name: Parse labels.json -> allowed_types_csv
+    - name: Parse labels.json -> allowed_types_nl
       id: emit
       shell: bash
       env:
@@ -34,7 +34,6 @@ runs:
       run: |
         set -euo pipefail
 
-        # Resolve relative paths under .org-config
         if [[ "${INPUT_PATH}" = /* ]]; then
           LABELS_FILE="${INPUT_PATH}"
         else
@@ -46,7 +45,7 @@ runs:
 
         export LABELS_FILE
 
-        python - <<'PY' > types.txt
+        python - <<'PY' > types_nl.txt
         import json, os, sys
         p = os.environ["LABELS_FILE"]
         with open(p, "r", encoding="utf-8") as f:
@@ -57,14 +56,20 @@ runs:
         for lbl in labels:
             t = lbl.get("semantic_types", [])
             if isinstance(t, list):
-                types.extend([s for s in t if isinstance(s, str)])
+                for s in t:
+                    if isinstance(s, str) and s.strip():
+                        types.append(s.strip())
 
-        norm = sorted(set(s.strip() for s in types if s and s.strip()))
-        if not norm:
+        types = sorted(set(types))  # dedupe + sort
+        if not types:
             print("labels.json contains no semantic_types", file=sys.stderr)
             sys.exit(3)
 
-        print(",".join(norm))
+        print("\n".join(types))
         PY
 
-        echo "allowed_types_csv=$(cat types.txt)" >> "$GITHUB_OUTPUT"
+        {
+          echo "allowed_types_nl<<__EOF__"
+          cat types_nl.txt
+          echo "__EOF__"
+        } >> "$GITHUB_OUTPUT"
