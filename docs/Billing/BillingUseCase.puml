@@ -1,0 +1,31 @@
+@startuml Kleff Hosting - Billing Use Cases
+left to right direction
+skinparam packageStyle rectangle
+
+actor "Application Owner" as Owner #lightblue
+actor "Payment Gateway" as Payment #green
+
+rectangle "Kleff Hosting Platform" {
+  package "Billing" #B3E5FC {
+    usecase "UC-40: View Billing Dashboard" as UC40
+    usecase "UC-41: Pay Invoice" as UC41
+    usecase "UC-42: Download Invoice" as UC42
+    usecase "UC-43: Update Payment Method" as UC43
+    usecase "UC-44: View Bill History" as UC44
+  }
+}
+
+' Owner
+Owner -- UC40
+Owner -- UC41
+Owner -- UC42
+Owner -- UC43
+Owner -- UC44
+
+' System trigger
+UC41 ..> Payment : <<system trigger>>\nPayment processing
+
+' Extends
+UC42 .> UC41 : <<extends>>
+
+@enduml

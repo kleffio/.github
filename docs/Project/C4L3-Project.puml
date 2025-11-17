@@ -1,0 +1,84 @@
+@startuml Kleff Hosting C4L3 - Project Management
+!includeurl https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+LAYOUT_WITH_LEGEND()
+
+title Level 3 - Component Diagram for Project Management Service (Project Lifecycle & Collaboration)
+
+' ==== External Containers / Systems (from C4L2) ====
+Container(spa, "Kleff Dashboard (SPA)", "TypeScript, React", "Frontend for project owners & collaborators.")
+Container(identity_svc, "Identity & Access Service", "Java/Go", "Manages users, roles, and tenants.")
+ContainerDb(project_db, "project-db", "PostgreSQL", "Stores Projects, Collaborators, permissions, and webhook configuration.")
+System_Ext(email_service, "Email Service", "SMTP / Email API", "Sends collaboration invitations and notifications.")
+System_Ext(git_provider, "Git Provider", "GitHub/GitLab", "Hosts repositories and webhooks.")
+
+' ==== Project Management Service Boundary ====
+Container_Boundary(project_svc, "Project Management Service") {
+
+  ' ---- API Layer (Controllers) ----
+  Component(project_api, "Project API Controller", "REST Controller", "CRUD for projects, repository settings, and deployment configuration (/api/projects/*).")
+
+  Component(collab_api, "Collaborator API Controller", "REST Controller", "Manages project collaborators, roles, and project-level permissions (/api/collaborators/*).")
+
+  Component(project_perm_api, "Project Permissions API Controller", "REST Controller", "Exposes endpoints used by other services to validate project-level permissions (e.g., DEPLOY, VIEW_LOGS).")
+
+  ' ---- Application / Service Layer ----
+  Component(project_app_svc, "Project Application Service", "Application Service", "Coordinates project creation, updates, status changes, and repository/webhook configuration.")
+
+  Component(collab_app_svc, "Collaboration Application Service", "Application Service",, "Handles invitations, collaborator role changes, and project permission updates.")
+
+  Component(project_permission_svc, "Project Permission Service", "Application Service", "Evaluates project-level permissions for a given user/tenant and project.")
+
+  ' ---- Domain Layer ----
+  Component(project_domain, "Project Aggregate", "Domain Model", "Implements Project invariants: unique name per owner, valid status transitions, and repository settings.")
+
+  Component(collab_domain, "ProjectCollaborator Entity", "Domain Model", "Represents membership of a user in a project with a role and fine-grained permissions.")
+
+  Component(domain_events, "Project Domain Event Publisher", "Domain Service", "Raises events (ProjectCreated, CollaboratorInvited, CollaboratorRoleChanged) for notifications and audit.")
+
+  ' ---- Infrastructure / Adapters ----
+  Component(project_repo, "ProjectRepository", "Repository Adapter", "Persists and retrieves Project aggregates and collaborator entities from project-db.")
+
+  Component(identity_client, "IdentityServiceClient", "Integration Adapter", "Looks up users by ID/email and validates their existence in the Identity & Access BC.")
+
+  Component(email_adapter, "ProjectEmailAdapter", "Integration Adapter", "Sends collaboration invitations and project notifications via Email Service.")
+
+  Component(git_integration, "GitIntegrationAdapter", "Integration Adapter", "Configures webhooks and repository metadata on the Git Provider when projects are created/updated.")
+}
+
+' ==== Relationships: SPA -> Project Management Service ====
+Rel(spa, project_api, "Creates and manages projects via /api/projects/*", "JSON/REST/HTTPS (Bearer)")
+Rel(spa, collab_api, "Manages collaborators & roles via /api/collaborators/*", "JSON/REST/HTTPS (Bearer)")
+
+' ==== Relationships: Other Services -> Project Management ====
+Rel(identity_svc, project_perm_api, "May query project permissions for cross-BC operations", "JSON/REST/HTTPS")
+' From C4L2: deployment & observability services validate project permissions here
+Rel_D(project_perm_api, project_permission_svc, "Validates DEPLOY, VIEW_LOGS, VIEW_METRICS, etc.", "Method calls")
+
+' ==== API -> Application Layer ====
+Rel(project_api, project_app_svc, "Invokes", "Method calls")
+Rel(collab_api, collab_app_svc, "Invokes", "Method calls")
+Rel(project_perm_api, project_permission_svc, "Invokes", "Method calls")
+
+' ==== Application -> Domain & Adapters ====
+Rel(project_app_svc, project_repo, "Creates/updates Projects & webhook config", "Repository API")
+Rel(project_app_svc, project_domain, "Applies domain logic", "Method calls")
+Rel(project_app_svc, git_integration, "Configures webhooks on repository", "HTTPS/API")
+Rel(project_app_svc, domain_events, "Publishes ProjectCreated/Updated events", "Event dispatch")
+
+Rel(collab_app_svc, project_repo, "Updates collaborator roles & permissions", "Repository API")
+Rel(collab_app_svc, collab_domain, "Applies collaboration domain rules", "Method calls")
+Rel(collab_app_svc, identity_client, "Resolves invitee user IDs", "JSON/REST/HTTPS")
+Rel(collab_app_svc, email_adapter, "Sends invitations to collaborators", "Send email")
+Rel(collab_app_svc, domain_events, "Publishes CollaboratorInvited/RoleChanged events", "Event dispatch")
+
+Rel(project_permission_svc, project_repo, "Reads project collaborators & permissions", "Repository API")
+Rel(project_permission_svc, collab_domain, "Evaluates project-level permissions", "Method calls")
+
+' ==== Adapters -> External Systems ====
+Rel(project_repo, project_db, "Reads/Writes Projects & Collaborators", "SQL")
+Rel(identity_client, identity_svc, "Reads User info from Identity & Access BC", "JSON/REST/HTTPS")
+Rel(email_adapter, email_service, "Sends invitation emails", "SMTP/HTTPS")
+Rel(git_integration, git_provider, "Configures webhooks & repo metadata", "HTTPS/Git API")
+
+@enduml

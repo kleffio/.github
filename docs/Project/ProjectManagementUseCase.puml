@@ -1,0 +1,30 @@
+@startuml Kleff Hosting - Project Management Use Cases
+left to right direction
+skinparam packageStyle rectangle
+
+actor "Application Owner" as Owner #lightblue
+actor "Collaborator" as Collab #lightgreen
+
+rectangle "Kleff Hosting Platform" {
+  package "Project Management" #D1C4E9 {
+    usecase "UC-10: Create Project" as UC10
+    usecase "UC-11: Configure Project Settings" as UC11
+    usecase "UC-12: Invite Collaborator" as UC12
+    usecase "UC-13: Assign Permissions" as UC13
+    usecase "UC-14: Remove Collaborator" as UC14
+    usecase "UC-15: View Project Dashboard" as UC15
+  }
+}
+
+' Owner
+Owner -- UC10
+Owner -- UC11
+Owner -- UC12
+Owner -- UC13
+Owner -- UC14
+Owner -- UC15
+
+' Collaborator
+Collab -- UC15
+
+@enduml

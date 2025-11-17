@@ -1,0 +1,37 @@
+@startuml Kleff Hosting - Observability Use Cases
+left to right direction
+skinparam packageStyle rectangle
+
+actor "Application Owner" as Owner #lightblue
+actor "Collaborator" as Collab #lightgreen
+
+rectangle "Kleff Hosting Platform" {
+  package "Observability" #FFCCBC {
+    usecase "UC-30: View Application Logs" as UC30
+    usecase "UC-31: Filter/Search Logs" as UC31
+    usecase "UC-32: View Resource Metrics" as UC32
+    usecase "UC-33: Set Monitoring Alerts" as UC33
+    usecase "UC-34: Download Reports" as UC34
+    usecase "UC-35: View Error Summaries" as UC35
+  }
+}
+
+' Owner
+Owner -- UC30
+Owner -- UC31
+Owner -- UC32
+Owner -- UC33
+Owner -- UC34
+Owner -- UC35
+
+' Collaborator
+Collab -- UC30
+Collab -- UC31
+Collab -- UC32
+
+' Extends
+UC31 .> UC30 : <<extends>>
+UC34 .> UC30 : <<extends>>
+UC34 .> UC32 : <<extends>>
+
+@enduml

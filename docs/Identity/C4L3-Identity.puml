@@ -1,0 +1,69 @@
+@startuml Kleff Hosting C4L3 - Identity & Access
+!includeurl https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+LAYOUT_WITH_LEGEND()
+
+title Level 3 - Component Diagram for Identity & Access (User Account & Access Management)
+
+' ==== External Containers / Systems (from C4L2) ====
+Container(spa, "Kleff Dashboard (SPA)", "TypeScript, React", "Frontend for developers & collaborators.")
+ContainerDb(identity_db, "identity-db", "PostgreSQL", "Stores User aggregates, external identity links (issuer + subject), tenant memberships, and system roles.")
+System_Ext(auth_idp, "Authentik IDP", "OIDC/OAuth2 Provider", "Handles login, MFA, password reset, and issues ID/Access tokens.")
+System_Ext(email_service, "Email Service", "SMTP / Email API", "Sends welcome and notification emails.")
+
+' ==== Identity & Access Service Boundary ====
+Container_Boundary(identity_svc, "Identity & Access Service") {
+
+  ' ---- API Layer (Controllers) ----
+  Component(user_api, "User & Profile API Controller", "REST Controller", "Exposes endpoints for reading/updating user profile & tenant memberships (/api/users/*).")
+
+  Component(access_api, "Access Management API Controller", "REST Controller", "Exposes endpoints for reading current role, permissions, and admin-level user/tenant access (/api/access/*).")
+
+  ' ---- Application / Service Layer ----
+  Component(user_app_svc, "User Management Application Service", "Application Service", "Handles user provisioning, profile updates, linking Authentik identities, and tenant membership changes.")
+
+  Component(access_app_svc, "Access Control Application Service", "Application Service", "Evaluates roles & permissions for secured operations; used by other services via API.")
+
+  ' ---- Domain Layer ----
+  Component(user_domain, "User Aggregate", "Domain Model", "Implements User invariants: unique external identity (issuer+subject), unique email/username, valid role & tenant membership changes.")
+
+  Component(domain_events, "Domain Event Publisher", "Domain Service", "Raises domain events (UserProvisioned, UserRoleChanged, TenantMembershipUpdated) for audit/logging/notifications.")
+
+  ' ---- Infrastructure / Adapters ----
+  Component(user_repo, "UserRepository", "Repository Adapter", "Persists and retrieves User aggregates and tenant memberships from identity-db.")
+
+  Component(oidc_adapter, "OIDC / Authentik Integration Adapter", "Security Adapter", "Maps Authentik token claims (issuer, subject, email, groups) to the current principal and validates token signatures using Authentik metadata.")
+
+  Component(email_adapter, "EmailNotificationAdapter", "Integration Adapter", "Sends welcome and notification emails via Email Service.")
+}
+
+' ==== Relationships: SPA -> Identity & Access Service & Authentik ====
+
+' Login/logout are delegated directly to Authentik
+Rel(spa, auth_idp, "Browser-based login/logout via OIDC (redirects)", "HTTPS / OIDC (PKCE)")
+
+' After login, SPA calls APIs with Authentik-issued Bearer token
+Rel(spa, user_api, "Manages profile & tenants via /api/users/* (Bearer token from Authentik)", "JSON/REST/HTTPS (Bearer)")
+Rel(spa, access_api, "Queries roles & permissions via /api/access/* (Bearer token from Authentik)", "JSON/REST/HTTPS (Bearer)")
+
+' ==== Relationships: API Layer -> Application Layer ====
+Rel(user_api, user_app_svc, "Invokes", "Method calls")
+Rel(access_api, access_app_svc, "Invokes", "Method calls")
+
+' ==== Relationships: Application Layer -> Domain & Adapters ====
+Rel(user_app_svc, user_repo, "Creates/updates User aggregates & tenant memberships", "Repository API")
+Rel(user_app_svc, user_domain, "Applies domain logic", "Method calls")
+Rel(user_app_svc, domain_events, "Publishes events (UserProvisioned, etc.)", "Event dispatch")
+Rel(user_app_svc, email_adapter, "Triggers welcome/notification emails", "Send email")
+Rel(user_app_svc, oidc_adapter, "Resolves external identity (issuer+subject) to internal User", "Principal resolution")
+
+Rel(access_app_svc, user_repo, "Reads User roles, tenants, and permissions", "Repository API")
+Rel(access_app_svc, user_domain, "Evaluates authorization rules", "Method calls")
+Rel(access_app_svc, oidc_adapter, "Obtains current principal from Authentik token claims", "Principal resolution")
+
+' ==== Relationships: Adapters -> External Systems ====
+Rel(user_repo, identity_db, "Reads/Writes User aggregates & tenant memberships", "SQL")
+Rel(oidc_adapter, auth_idp, "Fetches JWKS & OIDC metadata; validates tokens", "HTTPS / OIDC Discovery")
+Rel(email_adapter, email_service, "Sends emails", "SMTP / HTTPS API")
+
+@enduml

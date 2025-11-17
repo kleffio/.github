@@ -1,0 +1,38 @@
+@startuml Kleff Hosting - Deployment Use Cases
+left to right direction
+skinparam packageStyle rectangle
+
+actor "Application Owner" as Owner #lightblue
+actor "Collaborator" as Collab #lightgreen
+actor "Git Provider" as Git #purple
+
+rectangle "Kleff Hosting Platform" {
+  package "Deployment" #FFF9C4 {
+    usecase "UC-20: Deploy Application" as UC20
+    usecase "UC-21: Update Application" as UC21
+    usecase "UC-22: Rollback Deployment" as UC22
+    usecase "UC-23: Stop/Start Container" as UC23
+    usecase "UC-24: View Deployment History" as UC24
+  }
+}
+
+' Owner
+Owner -- UC20
+Owner -- UC21
+Owner -- UC22
+Owner -- UC23
+Owner -- UC24
+
+' Collaborator
+Collab -- UC20
+Collab -- UC21
+Collab -- UC23
+Collab -- UC24
+
+' System trigger
+Git ..> UC20 : <<system trigger>>\nGit webhook
+
+' Extends
+UC22 .> UC20 : <<extends>>
+
+@enduml
