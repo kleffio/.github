@@ -8,7 +8,7 @@ skinparam usecase {
 }
 
 ' ==== Actors ====
-actor "Authenticated User" as AuthUser #silver
+actor "Developer" as AuthUser #silver
 actor "Project Owner" as Owner #lightblue
 actor "Collaborator" as Collab #lightgreen
 actor "System Administrator" as Admin #orange

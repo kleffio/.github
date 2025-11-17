@@ -8,11 +8,12 @@ skinparam usecase {
 }
 
 ' ==== Actors ====
-actor "Authenticated User" as AuthUser #silver
+actor "Developer" as AuthUser #silver
 actor "Project Owner" as Owner #lightblue
 actor "Collaborator" as Collab #lightgreen
 actor "System Administrator" as Admin #orange
 actor "Payment Gateway" as Payment #green
+actor "Time" as TimeActor #gray
 
 Owner -|> AuthUser
 Collab -|> AuthUser
@@ -25,6 +26,10 @@ rectangle "Kleff Hosting Platform" {
     usecase "UC-42: Download Invoice" as UC42
     usecase "UC-43: Update Payment Method" as UC43
     usecase "UC-44: View Bill History" as UC44
+
+    ' NEW Automatic time-based billing use cases
+    usecase "UC-45: Generate Monthly Bills" as UC45
+    usecase "UC-46: Send Billing Reminders" as UC46
   }
 }
 
@@ -35,7 +40,11 @@ Owner -- UC41
 Owner -- UC42
 Owner -- UC43
 
-' ==== System Trigger ====
+' ==== Time-based System Triggers ====
+TimeActor ..> UC45 : <<system trigger>>\nMonthly cycle
+TimeActor ..> UC46 : <<system trigger>>\nReminder schedule
+
+' ==== External System Trigger ====
 UC41 ..> Payment : <<system trigger>>\nPayment processing
 
 ' ==== EXTENDS ====
