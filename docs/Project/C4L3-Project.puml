@@ -81,4 +81,28 @@ Rel(identity_client, identity_svc, "Reads User info from Identity & Access BC", 
 Rel(email_adapter, email_service, "Sends invitation emails", "SMTP/HTTPS")
 Rel(git_integration, git_provider, "Configures webhooks & repo metadata", "HTTPS/Git API")
 
+' ==== Controller Endpoints ====
+' Project API Controller (/api/projects/*)
+' - GET    /api/projects
+' - POST   /api/projects
+' - GET    /api/projects/{projectId}
+' - PATCH  /api/projects/{projectId}
+' - DELETE /api/projects/{projectId}
+' - GET    /api/projects/{projectId}/settings
+' - PATCH  /api/projects/{projectId}/settings
+
+' Collaborator API Controller (/api/collaborators/*)
+' - GET    /api/projects/{projectId}/collaborators
+' - POST   /api/projects/{projectId}/collaborators
+' - PATCH  /api/projects/{projectId}/collaborators/{userId}
+' - DELETE /api/projects/{projectId}/collaborators/{userId}
+' - POST   /api/projects/{projectId}/collaborators/invitations
+
+' Project Permissions API Controller (/api/projects/*/permissions)
+' - GET    /api/projects/{projectId}/permissions
+' - POST   /api/projects/{projectId}/permissions/check
+' - POST   /api/projects/{projectId}/permissions/grants
+' - DELETE /api/projects/{projectId}/permissions/grants/{grantId}
+
+
 @enduml

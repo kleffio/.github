@@ -1,11 +1,21 @@
 @startuml Kleff Hosting Use Cases
 left to right direction
-skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam usecase {
+  BackgroundColor #FAFAFA
+  BorderColor #455A64
+  RoundCorner 14
+}
 
 ' ==== Actors ====
-actor "Application Owner" as Owner #lightblue
+actor "Authenticated User" as AuthUser #silver
+actor "Project Owner" as Owner #lightblue
 actor "Collaborator" as Collab #lightgreen
 actor "System Administrator" as Admin #orange
+
+' Generalization: Owner & Collaborator are Authenticated Users
+Owner -|> AuthUser
+Collab -|> AuthUser
 
 ' ==== External Systems ====
 actor "Git Provider" as Git #purple
@@ -13,146 +23,125 @@ actor "Payment Gateway" as Payment #green
 
 rectangle "Kleff Hosting Platform" {
 
-  ' ==========================================
-  ' User Account & Access Management
-  ' ==========================================
-  package "Identity & Access" #FFCDD2 {
-    usecase "UC-01: Register Account" as UC01
-    usecase "UC-02: Login with OAuth/Email" as UC02
-    usecase "UC-03: Manage User Profile" as UC03
-    usecase "UC-04: Reset Password" as UC04
-    usecase "UC-05: Manage Sessions & Tokens" as UC05
-    usecase "UC-06: Delete Account" as UC06
+  ' Column 1
+  together {
+    package "Identity & Access" #FFCDD2 {
+      usecase "UC-01: Register Account" as UC01
+      usecase "UC-02: Login with OAuth/Email" as UC02
+      usecase "UC-03: Manage User Profile" as UC03
+      usecase "UC-04: Reset Password" as UC04
+      usecase "UC-05: Manage Sessions & Tokens" as UC05
+      usecase "UC-06: Delete Account" as UC06
+    }
+    package "Project Management" #D1C4E9 {
+      usecase "UC-10: Create Project" as UC10
+      usecase "UC-11: Configure Project Settings" as UC11
+      usecase "UC-12: Invite Collaborator" as UC12
+      usecase "UC-13: Assign Permissions" as UC13
+      usecase "UC-14: Remove Collaborator" as UC14
+      usecase "UC-15: View Project Dashboard" as UC15
+    }
   }
 
-  ' ==========================================
-  ' Project Management
-  ' ==========================================
-  package "Project Management" #D1C4E9 {
-    usecase "UC-10: Create Project" as UC10
-    usecase "UC-11: Configure Project Settings" as UC11
-    usecase "UC-12: Invite Collaborator" as UC12
-    usecase "UC-13: Assign Permissions" as UC13
-    usecase "UC-14: Remove Collaborator" as UC14
-    usecase "UC-15: View Project Dashboard" as UC15
-  }
-
-  ' ==========================================
-  ' Application Lifecycle Management
-  ' ==========================================
-  package "Deployment" #FFF9C4 {
-    usecase "UC-20: Deploy Application" as UC20
-    usecase "UC-21: Update Application" as UC21
-    usecase "UC-22: Rollback Deployment" as UC22
-    usecase "UC-23: Stop/Start Container" as UC23
-    usecase "UC-24: View Deployment History" as UC24
-  }
-
-  ' ==========================================
-  ' Application Troubleshooting & Monitoring
-  ' ==========================================
-  package "Observability" #FFCCBC {
-    usecase "UC-30: View Application Logs" as UC30
-    usecase "UC-31: Filter/Search Logs" as UC31
-    usecase "UC-32: View Resource Metrics" as UC32
-    usecase "UC-33: Set Monitoring Alerts" as UC33
-    usecase "UC-34: Download Reports" as UC34
-    usecase "UC-35: View Error Summaries" as UC35
-  }
-
-  ' ==========================================
-  ' Billing & Subscription Management
-  ' ==========================================
-  package "Billing" #B3E5FC {
-    usecase "UC-40: View Billing Dashboard" as UC40
-    usecase "UC-41: Pay Invoice" as UC41
-    usecase "UC-42: Download Invoice" as UC42
-    usecase "UC-43: Update Payment Method" as UC43
-    usecase "UC-44: View Bill History" as UC44
-  }
-
-  ' ==========================================
-  ' Platform Administration
-  ' ==========================================
-  package "Platform Admin" #FFE0B2 {
-    usecase "UC-50: View Cluster Health" as UC50
-    usecase "UC-51: Manage Service Plans" as UC51
-    usecase "UC-52: Suspend User Account" as UC52
+  ' Column 2
+  together {
+    package "Deployment" #FFF9C4 {
+      usecase "UC-20: Deploy Application" as UC20
+      usecase "UC-21: Update Application" as UC21
+      usecase "UC-22: Rollback Deployment" as UC22
+      usecase "UC-23: Stop/Start Container" as UC23
+      usecase "UC-24: View Deployment History" as UC24
+    }
+    package "Observability" #FFCCBC {
+      usecase "UC-30: View Application Logs" as UC30
+      usecase "UC-31: Filter/Search Logs" as UC31
+      usecase "UC-32: View Resource Metrics" as UC32
+      usecase "UC-33: Set Monitoring Alerts" as UC33
+      usecase "UC-34: Download Reports" as UC34
+      usecase "UC-35: View Error Summaries" as UC35
+    }
+    package "Billing" #B3E5FC {
+      usecase "UC-40: View Billing Dashboard" as UC40
+      usecase "UC-41: Pay Invoice" as UC41
+      usecase "UC-42: Download Invoice" as UC42
+      usecase "UC-43: Update Payment Method" as UC43
+      usecase "UC-44: View Bill History" as UC44
+    }
+    package "Platform Admin" #FFE0B2 {
+      usecase "UC-50: View Cluster Health" as UC50
+      usecase "UC-51: Manage Service Plans" as UC51
+      usecase "UC-52: Suspend User Account" as UC52
+    }
   }
 }
 
 ' ==========================================
-' Application Owner Relationships (SOLID LINES)
+' Actor Relationships (all non-includes wired)
 ' ==========================================
+AuthUser -- UC02
+AuthUser -- UC03
+AuthUser -- UC04
+AuthUser -- UC06
+AuthUser -- UC15
+AuthUser -- UC20
+AuthUser -- UC21
+AuthUser -- UC22
+AuthUser -- UC23
+AuthUser -- UC30
+AuthUser -- UC31
+AuthUser -- UC33
+AuthUser -- UC34
+AuthUser -- UC35
+AuthUser -- UC40
+
 Owner -- UC01
-Owner -- UC02
-Owner -- UC03
-Owner -- UC04
-Owner -- UC05
-Owner -- UC06
-
 Owner -- UC10
-Owner -- UC11
 Owner -- UC12
-Owner -- UC13
 Owner -- UC14
-Owner -- UC15
-
-Owner -- UC20
-Owner -- UC21
-Owner -- UC22
-Owner -- UC23
-Owner -- UC24
-
-Owner -- UC30
-Owner -- UC31
-Owner -- UC32
-Owner -- UC33
-Owner -- UC34
-Owner -- UC35
-
-Owner -- UC40
 Owner -- UC41
 Owner -- UC42
 Owner -- UC43
-Owner -- UC44
 
-' ==========================================
-' Collaborator Relationships (SOLID LINES)
-' ==========================================
-Collab -- UC02
-Collab -- UC03
-Collab -- UC04
-Collab -- UC05
+Collab -- UC12
+Collab -- UC14
 Collab -- UC15
-Collab -- UC20
-Collab -- UC21
-Collab -- UC23
-Collab -- UC24
 Collab -- UC30
-Collab -- UC31
-Collab -- UC32
 
-' ==========================================
-' System Administrator Relationships (SOLID LINES)
-' ==========================================
 Admin -- UC50
 Admin -- UC51
 Admin -- UC52
 
 ' ==========================================
-' System Triggers (DASHED LINES with labels)
+' System Triggers (DASHED LINES)
 ' ==========================================
 Git ..> UC20 : <<system trigger>>\nGit webhook
 UC41 ..> Payment : <<system trigger>>\nPayment processing
 
 ' ==========================================
-' Extends Relationships (Optional flows)
+' EXTENDS Relationships (optional / specialized flows)
 ' ==========================================
-UC31 .> UC30 : <<extends>>
+UC04 .> UC02 : <<extends>>
+UC21 .> UC20 : <<extends>>
 UC22 .> UC20 : <<extends>>
-UC42 .> UC41 : <<extends>>
+UC31 .> UC30 : <<extends>>
 UC34 .> UC30 : <<extends>>
 UC34 .> UC32 : <<extends>>
+UC35 .> UC30 : <<extends>>
+UC42 .> UC41 : <<extends>>
+UC43 .> UC41 : <<extends>>
+
+' ==========================================
+' INCLUDES Relationships (common mandatory subflows)
+' ==========================================
+UC02 ..> UC05 : <<includes>>
+UC06 ..> UC05 : <<includes>>
+UC10 ..> UC11 : <<includes>>
+UC12 ..> UC13 : <<includes>>
+UC14 ..> UC13 : <<includes>>
+UC20 ..> UC24 : <<includes>>
+UC33 ..> UC32 : <<includes>>
+UC40 ..> UC44 : <<includes>>
+UC50 ..> UC32 : <<includes>>
+UC52 ..> UC05 : <<includes>>
 
 @enduml
