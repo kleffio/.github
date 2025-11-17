@@ -1,6 +1,10 @@
-name: auto-label
+name: _auto-label
 on:
-  workflow_call: {}
+  workflow_call:
+    inputs:
+      config_repo: { type: string, default: kleffio/.github }
+      config_ref: { type: string, default: main }
+      unified_path: { type: string, default: configs/labels.yml }
 
 permissions:
   contents: read
@@ -10,8 +14,15 @@ jobs:
   label:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/labeler@v5
+      - uses: kleffio/.github/.github/actions/labels-provisioning@main
+        id: prep
         with:
-          configuration-path: .github/labeler.yml
+          config_repo: ${{ inputs.config_repo }}
+          config_ref: ${{ inputs.config_ref }}
+          unified_path: ${{ inputs.unified_path }}
+
+      - name: Apply labels
+        uses: actions/labeler@v5
+        with:
+          configuration-path: ${{ steps.prep.outputs.labeler_path }}
           repo-token: ${{ secrets.GITHUB_TOKEN }}

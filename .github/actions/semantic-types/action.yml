@@ -1,0 +1,75 @@
+name: Extract Semantic Types
+description: Parse labels.json and emit allowed semantic types for PR title checks
+inputs:
+  config_repo:
+    description: Repo containing labels.json
+    default: kleffio/.github
+  config_ref:
+    description: Git ref (branch/sha) to read
+    default: main
+  labels_path:
+    description: Path to labels.json within the repo (e.g., configs/labels.json)
+    default: configs/labels.json
+
+outputs:
+  allowed_types_nl:
+    description: Newline-separated semantic types derived from labels.json
+    value: ${{ steps.emit.outputs.allowed_types_nl }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Checkout config repo
+      uses: actions/checkout@v4
+      with:
+        repository: ${{ inputs.config_repo }}
+        ref: ${{ inputs.config_ref }}
+        path: .org-config
+
+    - name: Parse labels.json -> allowed_types_nl
+      id: emit
+      shell: bash
+      env:
+        INPUT_PATH: ${{ inputs.labels_path }}
+      run: |
+        set -euo pipefail
+
+        if [[ "${INPUT_PATH}" = /* ]]; then
+          LABELS_FILE="${INPUT_PATH}"
+        else
+          LABELS_FILE=".org-config/${INPUT_PATH}"
+        fi
+
+        echo "Using labels file: ${LABELS_FILE}"
+        test -f "$LABELS_FILE" || { echo "::error::labels.json not found at ${LABELS_FILE}"; exit 2; }
+
+        export LABELS_FILE
+
+        python - <<'PY' > types_nl.txt
+        import json, os, sys
+        p = os.environ["LABELS_FILE"]
+        with open(p, "r", encoding="utf-8") as f:
+            data = json.load(f)
+
+        labels = data.get("labels", [])
+        types = []
+        for lbl in labels:
+            t = lbl.get("semantic_types", [])
+            if isinstance(t, list):
+                for s in t:
+                    if isinstance(s, str) and s.strip():
+                        types.append(s.strip())
+
+        types = sorted(set(types))  # dedupe + sort
+        if not types:
+            print("labels.json contains no semantic_types", file=sys.stderr)
+            sys.exit(3)
+
+        print("\n".join(types))
+        PY
+
+        {
+          echo "allowed_types_nl<<__EOF__"
+          cat types_nl.txt
+          echo "__EOF__"
+        } >> "$GITHUB_OUTPUT"

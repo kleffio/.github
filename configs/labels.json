@@ -1,0 +1,71 @@
+{
+  "labels": [
+    {
+      "name": "feature",
+      "color": "1f883d",
+      "description": "New feature or enhancement",
+      "rules": {
+        "changed_files": ["**/*.go", "internal/**", "cmd/**"],
+        "branch_patterns": ["^feature/", "^feat/"]
+      },
+      "semantic_types": ["feature", "feat"]
+    },
+    {
+      "name": "bugfix",
+      "color": "d73a4a",
+      "description": "Bug fix",
+      "rules": {
+        "branch_patterns": ["^bugfix/", "^fix/"]
+      },
+      "semantic_types": ["bugfix", "fix"]
+    },
+    {
+      "name": "chore",
+      "color": "8f5bff",
+      "description": "Maintenance/devex",
+      "rules": {
+        "changed_files": [".github/**", "**/Dockerfile", "**/docker-compose*.yml"],
+        "branch_patterns": ["^chore/", "^deps/"]
+      },
+      "semantic_types": ["chore"]
+    },
+    {
+      "name": "docs",
+      "color": "0e8a16",
+      "description": "Documentation",
+      "rules": {
+        "changed_files": ["**/*.md", "docs/**"]
+      },
+      "semantic_types": ["docs", "doc"]
+    },
+    {
+      "name": "refactor",
+      "color": "fbca04",
+      "description": "Refactor",
+      "rules": {
+        "branch_patterns": ["^refactor/"]
+      },
+      "semantic_types": ["refactor"]
+    },
+    {
+      "name": "security",
+      "color": "b60205",
+      "description": "Security fix/hardening",
+      "rules": {
+        "changed_files": ["internal/**/crypto/**", "**/*auth*/*", "**/security/**"],
+        "branch_patterns": ["^security/"]
+      },
+      "semantic_types": ["security", "sec"]
+    },
+    {
+      "name": "tests",
+      "color": "5319e7",
+      "description": "Test changes",
+      "rules": {
+        "changed_files": ["**/*_test.go", "test/**"],
+        "branch_patterns": ["^test/", "^tests/"]
+      },
+      "semantic_types": ["tests", "test"]
+    }
+  ]
+}
