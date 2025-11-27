@@ -8,12 +8,15 @@ skinparam usecase {
 }
 
 ' ==== Actors ====
-actor "Authenticated User" as AuthUser #silver
+actor "Developer" as AuthUser #silver
 actor "Project Owner" as Owner #lightblue
 actor "Collaborator" as Collab #lightgreen
 actor "System Administrator" as Admin #orange
 
-' Generalization: Owner & Collaborator are Authenticated Users
+' Time actor for Billing (monthly cycles)
+actor "Time" as TimeActor #gray
+
+' Generalization: Owner & Collaborator are Developers
 Owner -|> AuthUser
 Collab -|> AuthUser
 
@@ -33,6 +36,7 @@ rectangle "Kleff Hosting Platform" {
       usecase "UC-05: Manage Sessions & Tokens" as UC05
       usecase "UC-06: Delete Account" as UC06
     }
+
     package "Project Management" #D1C4E9 {
       usecase "UC-10: Create Project" as UC10
       usecase "UC-11: Configure Project Settings" as UC11
@@ -52,6 +56,7 @@ rectangle "Kleff Hosting Platform" {
       usecase "UC-23: Stop/Start Container" as UC23
       usecase "UC-24: View Deployment History" as UC24
     }
+
     package "Observability" #FFCCBC {
       usecase "UC-30: View Application Logs" as UC30
       usecase "UC-31: Filter/Search Logs" as UC31
@@ -60,13 +65,19 @@ rectangle "Kleff Hosting Platform" {
       usecase "UC-34: Download Reports" as UC34
       usecase "UC-35: View Error Summaries" as UC35
     }
+
     package "Billing" #B3E5FC {
       usecase "UC-40: View Billing Dashboard" as UC40
       usecase "UC-41: Pay Invoice" as UC41
       usecase "UC-42: Download Invoice" as UC42
       usecase "UC-43: Update Payment Method" as UC43
       usecase "UC-44: View Bill History" as UC44
+
+      ' NEW: automatic monthly cycle
+      usecase "UC-45: Generate Monthly Bills" as UC45
+      usecase "UC-46: Send Billing Reminders" as UC46
     }
+
     package "Platform Admin" #FFE0B2 {
       usecase "UC-50: View Cluster Health" as UC50
       usecase "UC-51: Manage Service Plans" as UC51
@@ -76,7 +87,7 @@ rectangle "Kleff Hosting Platform" {
 }
 
 ' ==========================================
-' Actor Relationships (all non-includes wired)
+' Actor Relationships
 ' ==========================================
 AuthUser -- UC02
 AuthUser -- UC03
@@ -111,14 +122,22 @@ Admin -- UC50
 Admin -- UC51
 Admin -- UC52
 
+' ==== Time-based Triggers (dashed) ====
+TimeActor ..> UC45 : <<system trigger>>\nMonthly cycle
+TimeActor ..> UC46 : <<system trigger>>\nReminder schedule
+
 ' ==========================================
-' System Triggers (DASHED LINES)
+' Payment Trigger
 ' ==========================================
-Git ..> UC20 : <<system trigger>>\nGit webhook
 UC41 ..> Payment : <<system trigger>>\nPayment processing
 
 ' ==========================================
-' EXTENDS Relationships (optional / specialized flows)
+' Deployment Trigger
+' ==========================================
+Git ..> UC20 : <<system trigger>>\nGit webhook
+
+' ==========================================
+' EXTENDS
 ' ==========================================
 UC04 .> UC02 : <<extends>>
 UC21 .> UC20 : <<extends>>
@@ -131,7 +150,7 @@ UC42 .> UC41 : <<extends>>
 UC43 .> UC41 : <<extends>>
 
 ' ==========================================
-' INCLUDES Relationships (common mandatory subflows)
+' INCLUDES
 ' ==========================================
 UC02 ..> UC05 : <<includes>>
 UC06 ..> UC05 : <<includes>>

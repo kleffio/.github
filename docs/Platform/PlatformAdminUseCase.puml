@@ -1,10 +1,23 @@
 @startuml Kleff Hosting - Platform Admin Use Cases
 left to right direction
-skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam usecase {
+  BackgroundColor #FAFAFA
+  BorderColor #455A64
+  RoundCorner 14
+}
 
+' ==== Actors ====
+actor "Developer" as AuthUser #silver
+actor "Project Owner" as Owner #lightblue
+actor "Collaborator" as Collab #lightgreen
 actor "System Administrator" as Admin #orange
 
+Owner -|> AuthUser
+Collab -|> AuthUser
+
 rectangle "Kleff Hosting Platform" {
+
   package "Platform Admin" #FFE0B2 {
     usecase "UC-50: View Cluster Health" as UC50
     usecase "UC-51: Manage Service Plans" as UC51
@@ -12,8 +25,13 @@ rectangle "Kleff Hosting Platform" {
   }
 }
 
+' ==== Actor Relationships ====
 Admin -- UC50
 Admin -- UC51
 Admin -- UC52
+
+' ==== Cross-Context INCLUDES (commented, from original) ====
+UC50 ..> UC32 : <<includes>>  ' from Observability BC (View Resource Metrics)
+UC52 ..> UC05 : <<includes>>  ' from Identity & Access BC (Manage Sessions & Tokens)
 
 @enduml

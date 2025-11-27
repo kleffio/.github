@@ -31,7 +31,8 @@ SHOW_PERSON_OUTLINE()
 title Container Diagram for Kleff Hosting PaaS\n(Docker Compose Projects with GitHub-style Collaboration)
 
 ' ==== People ====
-Person(developer, "Developer", "Project Owner - Creates projects and manages team")
+Person(developer, "Developer", "Developers - Log in to check their associated projects and user profile")
+Person(projectowner, "Project Owner", "Project Owner - Creates projects and manages team")
 Person(collaborator, "Collaborator", "Team Member - Works on projects with assigned permissions")
 Person(admin, "System Admin", "Platform Admin - Manages infrastructure")
 
@@ -83,6 +84,7 @@ System_Boundary(kleff, "Kleff Hosting System") {
 }
 
 ' ==== Relationships: People -> Web ====
+Rel(projectowner, landing_app, "Visits kleff.io", "HTTPS")
 Rel(developer, landing_app, "Visits kleff.io", "HTTPS")
 Rel(collaborator, landing_app, "Visits kleff.io", "HTTPS")
 Rel(admin, landing_app, "Visits kleff.io/admin", "HTTPS")
