@@ -24,6 +24,7 @@ AddRelTag("project-bc", $lineColor="#9C27B0", $legendText="Project Management BC
 AddRelTag("deployment-bc", $lineColor="#F9A825", $legendText="Deployment BC")
 AddRelTag("observability-bc", $lineColor="#FF6F00", $legendText="Observability BC")
 AddRelTag("billing-bc", $lineColor="#5C6BC0", $legendText="Billing BC")
+AddRelTag("workspace-bc", $lineColor="#4CAF50", $legendText="Workspace Management BC")
 
 LAYOUT_TOP_DOWN()
 SHOW_PERSON_OUTLINE()
@@ -56,16 +57,17 @@ System_Boundary(kleff, "Kleff Hosting System") {
     Container(api_gateway, "API Gateway", "Traefik / Nginx", "Routes traffic, authenticates requests, enforces rate limits", $tags="microService-go")
 
     ' --- Bounded Context Services ---
+    Container(workspace_svc, "Workspace Service", "Java Spring Boot", "BC: Workspace Management - Manages workspaces (create, settings, membership)", $sprite="spring_original", $tags="microService-java")
+
     together {
-        Container(identity_svc, "BC: Manages user profiles, tenants, and platform roles based on identities from Authentik", $sprite="spring_original", $tags="microService-java")
-        
-        Container(project_svc, "Project Management Service", "Java, Spring Boot", "BC: Project Lifecycle - Projects, collaborators, permissions (GitHub-style)", $sprite="spring_original", $tags="microService-java")
-        
-        Container(deploy_svc, "Deployment Service", "Go", "BC: Container Deployment - Parses docker-compose.yml, orchestrates deployments, manages containers", $sprite="go", $tags="microService-go")
-        
-        Container(obs_svc, "Observability Service", "Go", "BC: Monitoring & Logs - Collects metrics and logs from containers", $sprite="go", $tags="microService-go")
-        
+        Container(identity_svc, "User Service", "Java, Spring Boot", "BC: Manages user profiles, tenants, and platform roles based on identities from Authentik", $sprite="spring_original", $tags="microService-java")
         Container(billing_svc, "Billing Service", "Java, Spring Boot", "BC: Billing - Tracks usage per project/container, generates invoices", $sprite="spring_original", $tags="microService-java")
+        Container(project_svc, "Project Management Service", "Java, Spring Boot", "BC: Project Lifecycle - Projects, collaborators, permissions (GitHub-style)", $sprite="spring_original", $tags="microService-java")
+    }
+
+    together {
+        Container(deploy_svc, "Deployment Service", "Go", "BC: Container Deployment - Parses docker-compose.yml, orchestrates deployments, manages containers", $sprite="go", $tags="microService-go")
+        Container(obs_svc, "Observability Service", "Go", "BC: Monitoring & Logs - Collects metrics and logs from containers", $sprite="go", $tags="microService-go")
     }
 
     ' --- Infrastructure ---
@@ -74,6 +76,8 @@ System_Boundary(kleff, "Kleff Hosting System") {
     ' --- Data Stores (Per BC) ---
     ContainerDb(identity_db, "identity-db", "Postgres", "User profiles, external identity links (subject/issuer), tenant memberships, system roles", $sprite="postgresql", $tags="storage-postgres")
     
+    ContainerDb(workspace_db, "workspace-db", "Postgres", "Workspaces, members, settings", $sprite="postgresql", $tags="storage-postgres")
+
     ContainerDb(project_db, "project-db", "Postgres", "Projects, collaborators, permissions, invitation state", $sprite="postgresql", $tags="storage-postgres")
     
     ContainerDb(deployment_db, "deployment-db", "Postgres", "Deployments, containers, docker-compose content, build logs", $sprite="postgresql", $tags="storage-postgres")
@@ -97,6 +101,7 @@ Rel(api_gateway, project_svc, "Routes /api/projects, /api/collaborators", "JSON/
 Rel(api_gateway, deploy_svc, "Routes /api/deployments, /api/containers", "JSON/REST/HTTPS", $tags="deployment-bc")
 Rel(api_gateway, obs_svc, "Routes /api/metrics, /api/logs", "JSON/REST/HTTPS", $tags="observability-bc")
 Rel(api_gateway, billing_svc, "Routes /api/billing, /api/invoices", "JSON/REST/HTTPS", $tags="billing-bc")
+Rel(api_gateway, workspace_svc, "Routes /api/workspaces", "JSON/REST/HTTPS", $tags="workspace-bc")
 
 ' ==== Identity & Access BC ====
 Rel(api_gateway, auth_idp, "Validates access tokens (JWKS) / enforces OIDC", "HTTPS/OIDC Discovery")
@@ -105,9 +110,14 @@ Rel(spa, auth_idp, "Browser redirects for login/logout via OIDC", "HTTPS/OIDC")
 Rel(identity_svc, identity_db, "Reads/writes User aggregates", "JDBC/SQL/TCP", $tags="identity-bc")
 Rel(identity_svc, email_service, "Sends verification emails", "SMTP/HTTPS", $tags="identity-bc")
 
+' ==== Workspace Management BC ====
+Rel(workspace_svc, workspace_db, "Reads/writes Workspaces, Members, Settings", "JDBC/SQL/TCP", $tags="workspace-bc")
+Rel(workspace_svc, identity_svc, "Looks up users for workspace membership/invitations", "JSON/REST/HTTPS", $tags="workspace-bc")
+Rel(workspace_svc, project_svc, "Validates workspace ownership & membership", "JSON/REST/HTTPS", $tags="workspace-bc")
+Rel(workspace_svc, billing_svc, "Retrieves workspace info for billing", "JSON/REST/HTTPS", $tags="workspace-bc")
+
 ' ==== Project Management BC ====
 Rel(project_svc, project_db, "Reads/writes Projects, Collaborators, Permissions", "JDBC/SQL/TCP", $tags="project-bc")
-Rel(project_svc, identity_svc, "Validates user existence for invitations", "JSON/REST/HTTPS", $tags="project-bc")
 Rel(project_svc, email_service, "Sends collaboration invitations", "SMTP/HTTPS", $tags="project-bc")
 
 ' ==== Deployment BC ====

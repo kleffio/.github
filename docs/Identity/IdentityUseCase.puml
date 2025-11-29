@@ -1,4 +1,4 @@
-@startuml Kleff Hosting - Identity & Access Use Cases
+@startuml IdentityAndAccess
 left to right direction
 skinparam shadowing false
 skinparam usecase {
@@ -7,19 +7,13 @@ skinparam usecase {
   RoundCorner 14
 }
 
-' ==== Actors ====
-actor "Developer" as AuthUser #silver
+actor "Developer" as Dev #silver
 actor "Project Owner" as Owner #lightblue
-actor "Collaborator" as Collab #lightgreen
-actor "System Administrator" as Admin #orange
 
-' Generalization: Owner & Collaborator are Authenticated Users
-Owner -|> AuthUser
-Collab -|> AuthUser
-
+Owner -|> Dev
 rectangle "Kleff Hosting Platform" {
+  rectangle "Identity & Access" #FFCDD2 {
 
-  package "Identity & Access" #FFCDD2 {
     usecase "UC-01: Register Account" as UC01
     usecase "UC-02: Login with OAuth/Email" as UC02
     usecase "UC-03: Manage User Profile" as UC03
@@ -28,19 +22,15 @@ rectangle "Kleff Hosting Platform" {
     usecase "UC-06: Delete Account" as UC06
   }
 }
-
-' ==== Actor Relationships ====
-AuthUser -- UC02
-AuthUser -- UC03
-AuthUser -- UC04
-AuthUser -- UC06
+' Actor → main use cases
+Dev -- UC02
+Dev -- UC03
+Dev -- UC04
+Dev -- UC06
 
 Owner -- UC01
 
-' ==== EXTENDS ====
-UC04 .> UC02 : <<extends>>
-
-' ==== INCLUDES ====
+' Key include relationships
 UC02 ..> UC05 : <<includes>>
 UC06 ..> UC05 : <<includes>>
 

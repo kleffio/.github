@@ -11,7 +11,6 @@ skinparam usecase {
 actor "Developer" as AuthUser #silver
 actor "Project Owner" as Owner #lightblue
 actor "Collaborator" as Collab #lightgreen
-actor "System Administrator" as Admin #orange
 actor "Payment Gateway" as Payment #green
 actor "Time" as TimeActor #gray
 

@@ -1,4 +1,4 @@
-@startuml Kleff Hosting - Project Management Use Cases
+@startuml ProjectManagement
 left to right direction
 skinparam shadowing false
 skinparam usecase {
@@ -7,18 +7,15 @@ skinparam usecase {
   RoundCorner 14
 }
 
-' ==== Actors ====
-actor "Developer" as AuthUser #silver
+actor "Developer" as Dev #silver
 actor "Project Owner" as Owner #lightblue
 actor "Collaborator" as Collab #lightgreen
-actor "System Administrator" as Admin #orange
 
-Owner -|> AuthUser
-Collab -|> AuthUser
-
+Owner -|> Dev
+Collab -|> Dev
 rectangle "Kleff Hosting Platform" {
+  rectangle "Project Management" #D1C4E9 {
 
-  package "Project Management" #D1C4E9 {
     usecase "UC-10: Create Project" as UC10
     usecase "UC-11: Configure Project Settings" as UC11
     usecase "UC-12: Invite Collaborator" as UC12
@@ -27,19 +24,18 @@ rectangle "Kleff Hosting Platform" {
     usecase "UC-15: View Project Dashboard" as UC15
   }
 }
-
-' ==== Actor Relationships ====
-AuthUser -- UC15
-
+' Actors → main use cases
 Owner -- UC10
+Owner -- UC11
 Owner -- UC12
 Owner -- UC14
 
 Collab -- UC12
 Collab -- UC14
-Collab -- UC15
 
-' ==== INCLUDES ====
+Dev -- UC15
+
+' Internal relationships
 UC10 ..> UC11 : <<includes>>
 UC12 ..> UC13 : <<includes>>
 UC14 ..> UC13 : <<includes>>

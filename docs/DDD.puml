@@ -75,12 +75,65 @@ rectangle "Kleff Hosting Domain" as Domain #line.dashed {
   }
 
   ' ==================================
+  ' Workspace Management BC
+  ' ==================================
+  package "Workspace Management BC\n(Tenants & Teams)" #C8E6C9 {
+
+    AGGREGATE_ROOT(Workspace) #lightblue {
+      workspaceId: WorkspaceIdentifier
+      name: String
+      slug: String
+      status: WorkspaceStatus
+      billingPlan: BillingPlan
+      createdAt: DateTime
+      ownerId: UserIdentifier
+    }
+
+    ENTITY(WorkspaceMember) #lightblue {
+      memberId: WorkspaceMemberIdentifier
+      workspaceId: WorkspaceIdentifier
+      userId: UserIdentifier
+      role: WorkspaceRole
+      joinedAt: DateTime
+      invitedBy: UserIdentifier
+    }
+
+    VALUE_OBJECT(WorkspaceIdentifier) #Bisque {
+      workspaceId: UUID
+    }
+
+    VALUE_OBJECT(WorkspaceMemberIdentifier) #Bisque {
+      memberId: UUID
+    }
+
+    note right of Workspace
+      Invariants:
+      - Slug unique platform-wide
+      - Must have at least one OWNER
+      - OWNER must be a WorkspaceMember
+    end note
+
+    note right of WorkspaceMember
+      Invariants:
+      - (workspaceId, userId) must be unique
+      - Cannot remove last OWNER
+    end note
+
+    Workspace "1" o--> "1" WorkspaceIdentifier
+    Workspace "1" --> "*" WorkspaceMember : members
+    WorkspaceMember "1" o--> "1" WorkspaceMemberIdentifier
+    WorkspaceMember "*" --> "1" Workspace : belongsTo
+    WorkspaceMember "*" --> "1" UserIdentifier : userId
+  }
+
+  ' ==================================
   ' Project Management BC
   ' ==================================
   package "Project Management BC\n(Project Lifecycle & Collaboration)" #D1C4E9 {
 
     AGGREGATE_ROOT(Project) #lightblue {
       projectId: ProjectIdentifier
+      workspaceId: WorkspaceIdentifier
       name: String
       description: String
       ownerId: UserIdentifier
@@ -166,6 +219,7 @@ rectangle "Kleff Hosting Domain" as Domain #line.dashed {
     Project "1" --> "1" UserIdentifier : ownerId
     Project "1" --> "0..1" GitWebhook : webhook
 
+    ProjectCollaborator "*" --> "1" WorkspaceIdentifier : viaProjectWorkspace
     ProjectCollaborator "1" o--> "1" CollaboratorIdentifier
     ProjectCollaborator "*" --> "1" Project : belongsTo
     ProjectCollaborator "1" --> "1" UserIdentifier : userId
@@ -350,6 +404,7 @@ rectangle "Kleff Hosting Domain" as Domain #line.dashed {
     AGGREGATE(ReservedAllocation) #lightblue {
         allocationId: ReservedAllocationIdentifier
         userId: UserIdentifier
+        workspaceId: WorkspaceIdentifier
         projectId: ProjectIdentifier
         cpuCores: Double
         memoryGb: Double
@@ -380,7 +435,7 @@ rectangle "Kleff Hosting Domain" as Domain #line.dashed {
 
     AGGREGATE(Invoice) #lightblue {
         invoiceId: InvoiceIdentifier
-        billedTo: UserIdentifier
+        billedToWorkspace: WorkspaceIdentifier
         periodStart: DateTime
         periodEnd: DateTime
         status: InvoiceStatus
@@ -429,6 +484,11 @@ rectangle "Kleff Hosting Domain" as Domain #line.dashed {
     InvoiceItem "1" o--> "1" InvoiceItemIdentifier
     InvoiceItem --> PricingModel
     InvoiceItem --> UsageMetric
+
+    Invoice "1" --> "1" WorkspaceIdentifier : billedToWorkspace
+    InvoiceItem --> ProjectIdentifier : projectId
+    ReservedAllocation "1" --> "1" WorkspaceIdentifier : workspaceId
+    ReservedAllocation "1" --> "0..1" ProjectIdentifier : projectId
   }
 
   ' ===============================
@@ -451,6 +511,12 @@ rectangle "Kleff Hosting Domain" as Domain #line.dashed {
 
   Invoice o--> UserIdentifier : billedTo
   InvoiceItem o--> ProjectIdentifier : projectId
+  
+  Project o--> WorkspaceIdentifier : workspaceId
+  WorkspaceMember o--> UserIdentifier : userId
+
+  ReservedAllocation o--> WorkspaceIdentifier : workspaceId
+  Invoice o--> WorkspaceIdentifier : billedToWorkspace
 }
 
 @enduml
