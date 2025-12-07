@@ -1,5 +1,6 @@
 name: Require Label
 description: Fail PRs that lack at least one required label
+
 inputs:
   label_names_csv:
     description: Comma-separated list of labels that satisfy the requirement
@@ -11,9 +12,10 @@ runs:
     - name: Enforce required labels
       uses: actions/github-script@v7
       with:
-        label_names_csv: ${{ inputs.label_names_csv }}
+        github-token: ${{ github.token }}
         script: |
-          const required = core.getInput('label_names_csv')
+          const csv = process.env.LABEL_NAMES_CSV || '';
+          const required = csv
             .split(',')
             .map(s => s.trim())
             .filter(Boolean);
@@ -23,18 +25,33 @@ runs:
             return;
           }
 
-          if (context.eventName !== 'pull_request') {
-            core.info('Not a pull_request event, skipping label requirement.');
+          if (context.eventName !== 'pull_request' && context.eventName !== 'pull_request_target') {
+            core.info(`Event "${context.eventName}" is not a pull_request event, skipping label requirement.`);
             return;
           }
 
-          const labels = context.payload.pull_request?.labels?.map(l => l.name) ?? [];
-          core.info(`Required: ${required.join(', ')}`);
-          core.info(`Present: ${labels.join(', ')}`);
+          const prNumber = context.payload.pull_request.number;
 
-          const ok = labels.some(l => required.includes(l));
+          const labels = await github.paginate(
+            github.rest.issues.listLabelsOnIssue,
+            {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber,
+            }
+          );
+
+          const present = labels.map(l => l.name);
+
+          core.info(`Required: ${required.join(', ')}`);
+          core.info(`Present: ${present.join(', ') || '(none)'}`);
+
+          const ok = required.some(label => present.includes(label));
+
           if (!ok) {
             core.setFailed(`PR must include at least one of: ${required.join(', ')}`);
           } else {
             core.info('Required label present ✅');
           }
+      env:
+        LABEL_NAMES_CSV: ${{ inputs.label_names_csv }}
