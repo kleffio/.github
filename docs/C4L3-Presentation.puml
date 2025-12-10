@@ -1,50 +1,82 @@
 @startuml C4L3-Presentation
-title C4 Level 3 – Presentation Tier (Kleff Dashboard)
+!includeurl https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
 
-skinparam packageStyle rectangle
+LAYOUT_WITH_LEGEND()
 
-package "Presentation Tier – Kleff Dashboard (React / Vite SPA)" {
+title Level 3 - Component Diagram for Presentation Tier (Kleff Dashboard SPA)
 
-  component "Dashboard Shell\n• Layout & Navigation\n• Tenant-aware routing" as DashboardShell
-  component "Auth UI Module\n• Login / Signup\n• OAuth buttons\n• Forgot password" as AuthUI
-  component "Tenant & Workspace Switcher\n• Current tenant\n• Switch / Join / Create" as TenantSwitcher
-  component "Project Management UI\n• Project list & details\n• Git repo binding\n• Environment view" as ProjectUI
-  component "Deployment Management UI\n• Deploy history\n• Live status\n• Rollbacks & actions" as DeploymentUI
-  component "Billing & Subscription UI\n• Plan selector\n• Payment methods\n• Invoices" as BillingUI
-  component "Observability & Logs UI\n• Logs viewer\n• Metrics dashboards\n• Alerts configuration" as ObservabilityUI
-  component "Account & Profile Settings UI\n• Profile\n• Security\n• Personal preferences" as AccountUI
-  component "Frontend API Client SDK\n• REST client\n• Auth token handling\n• Error / retry policies" as ApiClient
+' ==== External Backend Services (from C4L2) ====
+Container(api_gateway, "API Gateway", "Traefik/Nginx", "Routes authenticated requests to backend services")
+Container(identity_svc, "Identity & Access Service", "Java Spring Boot", "User authentication and authorization")
+Container(workspace_svc, "Workspace Service", "Java Spring Boot", "Workspace management")
+Container(project_svc, "Project Management Service", "Java Spring Boot", "Project lifecycle and collaboration")
+Container(deploy_svc, "Deployment Service", "Go", "Container deployment and orchestration")
+Container(obs_svc, "Observability Service", "Go", "Metrics and logs collection")
+Container(billing_svc, "Billing Service", "Java Spring Boot", "Usage tracking and invoicing")
+System_Ext(auth_idp, "Authentik IDP", "OIDC/OAuth2 authentication provider")
 
-  DashboardShell -[#gray]-> AuthUI
-  DashboardShell -[#gray]-> TenantSwitcher
-  DashboardShell -[#gray]-> ProjectUI
-  DashboardShell -[#gray]-> DeploymentUI
-  DashboardShell -[#gray]-> BillingUI
-  DashboardShell -[#gray]-> ObservabilityUI
-  DashboardShell -[#gray]-> AccountUI
+' ==== Presentation Tier Boundary ====
+Container_Boundary(spa, "Kleff Dashboard (SPA)") {
 
-  AuthUI --> ApiClient
-  TenantSwitcher --> ApiClient
-  ProjectUI --> ApiClient
-  DeploymentUI --> ApiClient
-  BillingUI --> ApiClient
-  ObservabilityUI --> ApiClient
-  AccountUI --> ApiClient
+  ' ---- Core Shell ----
+  Component(dashboard_shell, "Dashboard Shell", "React Component", "Main layout, navigation, and workspace-aware routing")
+
+  ' ---- Feature Modules ----
+  Component(auth_ui, "Authentication UI", "React Module", "Login, signup, OAuth buttons, password reset flows")
+  
+  Component(project_switcher, "Project Switcher", "React Component", "Switch between projects, create new projects, manage project context")
+  
+  Component(project_ui, "Project Management UI", "React Module", "Project list, project details, repository configuration, environment variables")
+  
+  Component(deployment_ui, "Deployment Management UI", "React Module", "Deployment history, live deployment status, rollback actions, container controls")
+  
+  Component(billing_ui, "Billing UI", "React Module", "Usage dashboard, invoices, payment methods, subscription plans")
+  
+  Component(observability_ui, "Observability UI", "React Module", "Log viewer, metrics dashboards, alert configuration")
+  
+  Component(account_ui, "Account Settings UI", "React Module", "User profile, security settings, personal preferences")
+
+  ' ---- Infrastructure Layer ----
+  Component(api_client, "API Client SDK", "TypeScript/Axios", "HTTP client with authentication, error handling, retry logic, and request/response interceptors")
+  
+  Component(auth_manager, "Authentication Manager", "React Context/Service", "Manages OAuth flow, token storage, token refresh, and session state")
 }
 
-' External APIs the frontend talks to (from C4 L2)
-package "Application Tier APIs (HTTP / JSON)" {
-  [Auth API]
-  [Tenant & Project API]
-  [Deployment API]
-  [Billing API]
-  [Observability API]
-}
+' ==== Relationships: User -> SPA ====
+Person(user, "Developer/Project Owner", "Uses web browser to access dashboard")
+Rel(user, dashboard_shell, "Accesses via HTTPS", "HTTPS/Web Browser")
 
-ApiClient --> [Auth API]
-ApiClient --> [Tenant & Project API]
-ApiClient --> [Deployment API]
-ApiClient --> [Billing API]
-ApiClient --> [Observability API]
+' ==== Relationships: Shell -> Feature Modules ====
+Rel(dashboard_shell, auth_ui, "Renders", "Component rendering")
+Rel(dashboard_shell, project_switcher, "Renders", "Component rendering")
+Rel(dashboard_shell, project_ui, "Renders", "Component rendering")
+Rel(dashboard_shell, deployment_ui, "Renders", "Component rendering")
+Rel(dashboard_shell, billing_ui, "Renders", "Component rendering")
+Rel(dashboard_shell, observability_ui, "Renders", "Component rendering")
+Rel(dashboard_shell, account_ui, "Renders", "Component rendering")
+
+' ==== Relationships: Feature Modules -> Infrastructure ====
+Rel(auth_ui, auth_manager, "Initiates login/logout", "Method calls")
+Rel(auth_ui, api_client, "Makes auth API calls", "HTTP requests")
+
+Rel(project_switcher, api_client, "Fetches projects", "HTTP requests")
+
+Rel(project_ui, api_client, "CRUD operations on projects", "HTTP requests")
+Rel(deployment_ui, api_client, "Deployment operations", "HTTP requests")
+Rel(billing_ui, api_client, "Billing data requests", "HTTP requests")
+Rel(observability_ui, api_client, "Metrics and logs queries", "HTTP requests")
+Rel(account_ui, api_client, "Profile updates", "HTTP requests")
+
+' ==== Relationships: Infrastructure -> Backend ====
+Rel(auth_manager, auth_idp, "OAuth2/OIDC flows (browser redirect)", "HTTPS/OIDC")
+Rel(api_client, api_gateway, "All API requests with Bearer token", "JSON/REST/HTTPS")
+
+' ==== Gateway Routes to Services ====
+Rel(api_gateway, identity_svc, "Routes /api/auth, /api/users", "HTTP/2")
+Rel(api_gateway, workspace_svc, "Routes /api/workspaces", "HTTP/2")
+Rel(api_gateway, project_svc, "Routes /api/projects, /api/collaborators", "HTTP/2")
+Rel(api_gateway, deploy_svc, "Routes /api/deployments, /api/containers", "HTTP/2")
+Rel(api_gateway, obs_svc, "Routes /api/metrics, /api/logs", "HTTP/2")
+Rel(api_gateway, billing_svc, "Routes /api/billing, /api/invoices", "HTTP/2")
 
 @enduml
