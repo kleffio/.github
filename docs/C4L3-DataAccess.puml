@@ -1,67 +1,120 @@
 @startuml C4L3-DataTier
-title C4 Level 3 – Data Tier (Kleff Data Platform)
+!includeurl https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
 
-skinparam packageStyle rectangle
+LAYOUT_WITH_LEGEND()
 
-package "Data Tier – Kleff Data Platform" {
+title Level 3 - Component Diagram for Data Tier (Kleff Data Platform)
 
-  ' ========= Core Relational Database (Postgres) =========
-  package "Kleff Relational Database (Postgres Cluster)" {
-    component "Identity Schema\n• users\n• tenants\n• sessions\n• oauth_identities" as IdentitySchema
-    component "Project Schema\n• projects\n• app_environments\n• deployments_meta" as ProjectSchema
-    component "Billing Schema\n• subscriptions\n• invoices\n• payment_methods\n• usage_records" as BillingSchema
-    component "Observability Schema\n• metrics_metadata\n• alert_rules\n• dashboards" as ObservabilitySchema
+' ==== Application Services (from C4L3-Application) ====
+Container(identity_svc, "Identity & Access Service", "Java Spring Boot", "Manages users and authentication")
+Container(workspace_svc, "Workspace Service", "Java Spring Boot", "Manages workspaces")
+Container(project_svc, "Project Management Service", "Java Spring Boot", "Manages projects and collaborators")
+Container(deploy_svc, "Deployment Service", "Go", "Handles container deployments")
+Container(obs_svc, "Observability Service", "Go", "Collects metrics and logs")
+Container(billing_svc, "Billing Service", "Java Spring Boot", "Tracks usage and invoicing")
 
-    component "Migration Runner\n(Goose / Flyway)" as MigrationRunner
-    component "Connection Pool\n(PgBouncer / Built-in pooling)" as ConnectionPool
-    component "Read Replica(s)\n(Read-only reporting / analytics)" as ReadReplica
-    component "Backup & Restore Service\n(Scheduled snapshots / PITR)" as BackupService
+' ==== Data Tier Boundary ====
+System_Boundary(data_tier, "Data Tier") {
 
-    MigrationRunner --> IdentitySchema
-    MigrationRunner --> ProjectSchema
-    MigrationRunner --> BillingSchema
-    MigrationRunner --> ObservabilitySchema
+  ' ---- Identity & Access Database ----
+  ContainerDb(identity_db, "identity-db", "PostgreSQL", "Stores users, external identity links (issuer+subject), tenant memberships, system roles")
+  
+  Component(users_table, "users", "Table", "userId (PK), email (UNIQUE), username (UNIQUE), externalIssuer, externalSubjectId, status, systemRole, createdAt")
+  Component(oauth_identities_table, "oauth_identities", "Table", "identityId (PK), userId (FK), issuer, subjectId, UNIQUE(issuer, subjectId)")
+  Component(sessions_table, "sessions", "Table", "sessionId (PK), userId (FK), token, expiresAt, createdAt")
 
-    ConnectionPool --> IdentitySchema
-    ConnectionPool --> ProjectSchema
-    ConnectionPool --> BillingSchema
-    ConnectionPool --> ObservabilitySchema
+  ' ---- Workspace Database ----
+  ContainerDb(workspace_db, "workspace-db", "PostgreSQL", "Stores workspaces, members, settings")
+  
+  Component(workspaces_table, "workspaces", "Table", "workspaceId (PK), name, slug (UNIQUE), status, billingPlan, ownerId (FK to users), createdAt")
+  Component(workspace_members_table, "workspace_members", "Table", "memberId (PK), workspaceId (FK), userId (FK), role, joinedAt, invitedBy (FK to users), UNIQUE(workspaceId, userId)")
 
-    ReadReplica -down- IdentitySchema
-    ReadReplica -down- ProjectSchema
-    ReadReplica -down- BillingSchema
-    ReadReplica -down- ObservabilitySchema
+  ' ---- Project Database ----
+  ContainerDb(project_db, "project-db", "PostgreSQL", "Stores projects, collaborators, permissions")
+  
+  Component(projects_table, "projects", "Table", "projectId (PK), workspaceId (FK), name, description, ownerId (FK to users), repositoryUrl, branch, status, createdAt")
+  Component(project_collaborators_table, "project_collaborators", "Table", "collaboratorId (PK), projectId (FK), userId (FK), role, permissions, invitedBy (FK), invitedAt, acceptedAt, UNIQUE(projectId, userId)")
+  Component(git_webhooks_table, "git_webhooks", "Table", "webhookId (PK), projectId (FK), webhookUrl, secret, enabled")
 
-    BackupService --> IdentitySchema
-    BackupService --> ProjectSchema
-    BackupService --> BillingSchema
-    BackupService --> ObservabilitySchema
-  }
+  ' ---- Deployment Database ----
+  ContainerDb(deployment_db, "deployment-db", "PostgreSQL", "Stores deployments, containers, runtime state")
+  
+  Component(deployments_table, "deployments", "Table", "deploymentId (PK), projectId (FK), version, commitHash, deployedBy (FK to users), nodeId, triggeredBy, status, dockerComposeContent, startedAt, completedAt")
+  Component(containers_table, "containers", "Table", "containerId (PK), deploymentId (FK), serviceName, imageName, imageTag, status, port, exposedPort, cpuLimit, memoryLimit, startedAt")
 
-  ' ========= Caching Layer =========
-  package "Caching Layer (Redis)" {
-    component "Auth Cache\n• session tokens\n• rate limits" as AuthCache
-    component "Config & Metadata Cache\n• tenant config\n• feature flags" as ConfigCache
-  }
+  ' ---- Observability Database ----
+  ContainerDb(obs_db, "observability-db", "TimescaleDB", "Stores time-series metrics and logs")
+  
+  Component(metrics_table, "metrics", "Hypertable", "metricId (PK), resourceId, resourceType, cpuUsage, memoryUsage, diskUsage, networkIn, networkOut, timestamp (time index)")
+  Component(log_entries_table, "log_entries", "Hypertable", "logId (PK), resourceId, resourceType, containerId (FK), level, message, timestamp (time index)")
+  Component(alert_rules_table, "alert_rules", "Table", "ruleId (PK), projectId (FK), name, condition, threshold, enabled")
 
-  ' ========= Logs & Metrics Storage =========
-  package "Logs & Metrics Storage" {
-    component "Log Store\n(Object storage / Loki index)" as LogStore
-    component "Metrics Store\n(Time-series DB like Prometheus)" as MetricsStore
-    component "Artifact Store\n(Build artifacts / images metadata)" as ArtifactStore
-  }
+  ' ---- Billing Database ----
+  ContainerDb(billing_db, "billing-db", "PostgreSQL", "Stores usage records, invoices, payment methods")
+  
+  Component(usage_records_table, "usage_records", "Table", "usageId (PK), projectId (FK), containerId (FK), pricingModel, metric, quantity, recordedAt")
+  Component(reserved_allocations_table, "reserved_allocations", "Table", "allocationId (PK), workspaceId (FK), projectId (FK), cpuCores, memoryGb, storageGb, containerLimit, monthlyPrice, startDate, endDate")
+  Component(invoices_table, "invoices", "Table", "invoiceId (PK), billedToWorkspace (FK), periodStart, periodEnd, status, subtotal, taxes, total")
+  Component(invoice_items_table, "invoice_items", "Table", "itemId (PK), invoiceId (FK), projectId (FK), description, pricingModel, metric, quantity, unitPrice, amount")
+
+  ' ---- Caching Layer ----
+  ContainerDb(redis_cache, "Redis Cache", "Redis", "Session tokens, rate limits, configuration cache")
 }
 
-' Which application components read/write here (high-level)
-[AuthService] -down-> ConnectionPool
-[TenantService] -down-> ConnectionPool
-[ProjectService] -down-> ConnectionPool
-[DeploymentService] -down-> ConnectionPool
-[BillingService] -down-> ConnectionPool
-[ObservabilityService] -down-> MetricsStore
-[ObservabilityService] -down-> LogStore
+' ==== Relationships: Services -> Databases (Ownership) ====
+Rel(identity_svc, identity_db, "Owns and writes to", "JDBC/SQL")
+Rel(workspace_svc, workspace_db, "Owns and writes to", "JDBC/SQL")
+Rel(project_svc, project_db, "Owns and writes to", "JDBC/SQL")
+Rel(deploy_svc, deployment_db, "Owns and writes to", "SQL")
+Rel(obs_svc, obs_db, "Owns and writes to", "SQL/TimescaleDB")
+Rel(billing_svc, billing_db, "Owns and writes to", "JDBC/SQL")
 
-[AuthService] --> AuthCache
-[ProjectService] --> ConfigCache
+' ==== Cross-Service Read-Only Access ====
+Rel(billing_svc, project_db, "Reads project metadata for invoices", "JDBC/SQL (read-only)")
+Rel(billing_svc, identity_db, "Reads user info for billing", "JDBC/SQL (read-only)")
+Rel(obs_svc, deployment_db, "Reads container metadata for labeling", "SQL (read-only)")
+
+' ==== Cache Usage ====
+Rel(identity_svc, redis_cache, "Caches session tokens and rate limits", "Redis Protocol")
+Rel(project_svc, redis_cache, "Caches project configuration", "Redis Protocol")
+
+' ==== Database Internal Structure ====
+Rel(identity_db, users_table, "Contains")
+Rel(identity_db, oauth_identities_table, "Contains")
+Rel(identity_db, sessions_table, "Contains")
+
+Rel(workspace_db, workspaces_table, "Contains")
+Rel(workspace_db, workspace_members_table, "Contains")
+
+Rel(project_db, projects_table, "Contains")
+Rel(project_db, project_collaborators_table, "Contains")
+Rel(project_db, git_webhooks_table, "Contains")
+
+Rel(deployment_db, deployments_table, "Contains")
+Rel(deployment_db, containers_table, "Contains")
+
+Rel(obs_db, metrics_table, "Contains")
+Rel(obs_db, log_entries_table, "Contains")
+Rel(obs_db, alert_rules_table, "Contains")
+
+Rel(billing_db, usage_records_table, "Contains")
+Rel(billing_db, reserved_allocations_table, "Contains")
+Rel(billing_db, invoices_table, "Contains")
+Rel(billing_db, invoice_items_table, "Contains")
+
+' ==== Foreign Key Relationships Between Databases ====
+Rel(workspaces_table, users_table, "ownerId FK", "Cross-database FK")
+Rel(workspace_members_table, users_table, "userId FK", "Cross-database FK")
+Rel(projects_table, workspaces_table, "workspaceId FK", "Cross-database FK")
+Rel(projects_table, users_table, "ownerId FK", "Cross-database FK")
+Rel(project_collaborators_table, users_table, "userId FK", "Cross-database FK")
+Rel(deployments_table, projects_table, "projectId FK", "Cross-database FK")
+Rel(deployments_table, users_table, "deployedBy FK", "Cross-database FK")
+Rel(log_entries_table, containers_table, "containerId FK", "Cross-database FK")
+Rel(usage_records_table, projects_table, "projectId FK", "Cross-database FK")
+Rel(usage_records_table, containers_table, "containerId FK", "Cross-database FK")
+Rel(reserved_allocations_table, workspaces_table, "workspaceId FK", "Cross-database FK")
+Rel(invoices_table, workspaces_table, "billedToWorkspace FK", "Cross-database FK")
+Rel(invoice_items_table, projects_table, "projectId FK", "Cross-database FK")
 
 @enduml
