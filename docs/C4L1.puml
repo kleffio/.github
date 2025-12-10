@@ -6,6 +6,7 @@ SHOW_PERSON_OUTLINE()
 title Level 1 - System Context Diagram for Kleff Hosting System
 
 ' ==== External Actors ====
+Person(visitor, "Visitor", "An unauthenticated user who can view the home page and public information.")
 Person(developer, "Developer", "A developer who would like to manage their account credentials and associated projects.")
 Person(projectowner, "Project Owner", "A developer who creates and manages projects with containerized applications.")
 Person(collaborator, "Collaborator", "A developer invited to contribute to projects with assigned permissions.")
@@ -22,6 +23,7 @@ System_Ext(git_provider, "Git Provider", "Hosts source repositories and sends we
 System(kleff, "Kleff Hosting", "PaaS that enables developers to deploy Docker Compose projects from Git repositories with team collaboration.")
 
 ' ==== Relationships ====
+Rel(visitor, kleff, "Views home page and public information", "HTTPS/Web")
 Rel(projectowner, kleff, "Creates projects, manages collaborators, deploys containers, monitors metrics", "HTTPS/Web")
 Rel(developer, kleff, "Updates their user profile, checks their associated ", "HTTPS/Web")
 Rel(collaborator, kleff, "Contributes to projects based on assigned permissions", "HTTPS/Web")
