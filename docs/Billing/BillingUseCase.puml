@@ -11,7 +11,7 @@ skinparam usecase {
 actor "Developer" as AuthUser #silver
 actor "Project Owner" as Owner #lightblue
 actor "Collaborator" as Collab #lightgreen
-actor "Payment Gateway" as Payment #green
+actor "Stripe" as Payment #green
 actor "Time" as TimeActor #gray
 
 Owner -|> AuthUser
@@ -20,10 +20,9 @@ Collab -|> AuthUser
 rectangle "Kleff Hosting Platform" {
 
   package "Billing" #B3E5FC {
-    usecase "UC-40: View Billing Dashboard" as UC40
+    usecase "UC-40: View Bills for Project" as UC40
     usecase "UC-41: Pay Invoice" as UC41
-    usecase "UC-42: Download Invoice" as UC42
-    usecase "UC-43: Update Payment Method" as UC43
+    usecase "UC-43: View Invoice" as UC43
     usecase "UC-44: View Bill History" as UC44
 
     ' NEW Automatic time-based billing use cases
@@ -36,7 +35,6 @@ rectangle "Kleff Hosting Platform" {
 AuthUser -- UC40
 
 Owner -- UC41
-Owner -- UC42
 Owner -- UC43
 
 ' ==== Time-based System Triggers ====
@@ -47,7 +45,6 @@ TimeActor ..> UC46 : <<system trigger>>\nReminder schedule
 UC41 ..> Payment : <<system trigger>>\nPayment processing
 
 ' ==== EXTENDS ====
-UC42 .> UC41 : <<extends>>
 UC43 .> UC41 : <<extends>>
 
 ' ==== INCLUDES ====
