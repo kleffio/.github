@@ -34,14 +34,13 @@ Container_Boundary(project_svc, "Project Management Service") {
 
   Component(collab_domain, "ProjectCollaborator Entity", "Domain Model", "Represents membership of a user in a project with a role and fine-grained permissions.")
 
-  Component(domain_events, "Project Domain Event Publisher", "Domain Service", "Raises events (ProjectCreated, CollaboratorInvited, CollaboratorRoleChanged) for notifications and audit.")
 
   ' ---- Infrastructure / Adapters ----
   Component(project_repo, "ProjectRepository", "Repository Adapter", "Persists and retrieves Project aggregates and collaborator entities from project-db.")
 
   Component(identity_client, "IdentityServiceClient", "Integration Adapter", "Looks up users by ID/email and validates their existence in the Identity & Access BC.")
 
-  Component(email_adapter, "ProjectEmailAdapter", "Integration Adapter", "Sends collaboration invitations and project notifications via Email Service.")
+  Component(email_adapter, "ProjectNotification", "Integration Adapter", "Sends collaboration invitations and project notifications via the application")
 
   Component(git_integration, "GitIntegrationAdapter", "Integration Adapter", "Configures webhooks and repository metadata on the Git Provider when projects are created/updated.")
 }
@@ -64,13 +63,11 @@ Rel(project_perm_api, project_permission_svc, "Invokes", "Method calls")
 Rel(project_app_svc, project_repo, "Creates/updates Projects & webhook config", "Repository API")
 Rel(project_app_svc, project_domain, "Applies domain logic", "Method calls")
 Rel(project_app_svc, git_integration, "Configures webhooks on repository", "HTTPS/API")
-Rel(project_app_svc, domain_events, "Publishes ProjectCreated/Updated events", "Event dispatch")
 
 Rel(collab_app_svc, project_repo, "Updates collaborator roles & permissions", "Repository API")
 Rel(collab_app_svc, collab_domain, "Applies collaboration domain rules", "Method calls")
 Rel(collab_app_svc, identity_client, "Resolves invitee user IDs", "JSON/REST/HTTPS")
 Rel(collab_app_svc, email_adapter, "Sends invitations to collaborators", "Send email")
-Rel(collab_app_svc, domain_events, "Publishes CollaboratorInvited/RoleChanged events", "Event dispatch")
 
 Rel(project_permission_svc, project_repo, "Reads project collaborators & permissions", "Repository API")
 Rel(project_permission_svc, collab_domain, "Evaluates project-level permissions", "Method calls")
@@ -78,7 +75,6 @@ Rel(project_permission_svc, collab_domain, "Evaluates project-level permissions"
 ' ==== Adapters -> External Systems ====
 Rel(project_repo, project_db, "Reads/Writes Projects & Collaborators", "SQL")
 Rel(identity_client, identity_svc, "Reads User info from Identity & Access BC", "JSON/REST/HTTPS")
-Rel(email_adapter, email_service, "Sends invitation emails", "SMTP/HTTPS")
 Rel(git_integration, git_provider, "Configures webhooks & repo metadata", "HTTPS/Git API")
 
 ' ==== Controller Endpoints ====
