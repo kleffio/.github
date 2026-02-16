@@ -25,53 +25,114 @@ rectangle "Kleff Hosting Domain" as Domain #line.dashed {
   package "Identity & Access BC\n(User Management & Authentication)" #FFCDD2 {
 
     AGGREGATE_ROOT(User) #lightblue {
-      userId: UserIdentifier
+      id: ID (OIDC sub)
+      authentikId: String
       email: String
+      emailVerified: Boolean
+      loginUsername: String
       username: String
-      externalIssuer: ExternalIssuer
-      externalSubjectId: ExternalSubjectIdentifier
-      status: UserStatus
-      systemRole: SystemRole
+      displayName: String
+      avatarUrl: String?
+      bio: String?
+      isDeactivated: Boolean
+      deactivatedAt: DateTime?
+      createdAt: DateTime
+      updatedAt: DateTime
+    }
+
+    VALUE_OBJECT(ID) #Bisque {
+      value: String
+    }
+
+    VALUE_OBJECT(TokenClaims) #Bisque {
+      sub: String
+      email: String
+      emailVerified: Boolean
+      preferredUsername: String
+    }
+
+    VALUE_OBJECT(ProfileUpdate) #Bisque {
+      username: String?
+      displayName: String?
+      avatarUrl: String?
+      bio: String?
+    }
+
+    VALUE_OBJECT(PublicProfile) #Bisque {
+      username: String
+      displayName: String
+      avatarUrl: String
+      bio: String
       createdAt: DateTime
     }
 
-    VALUE_OBJECT(ExternalSubjectIdentifier) #Bisque {
-      value: String
+    ENTITY(AuditLog) #lightblue {
+      id: String
+      userId: ID
+      action: String
+      changes: Map<String, ChangeDetail>
+      ipAddress: String
+      userAgent: String
+      timestamp: DateTime
     }
 
-    VALUE_OBJECT(ExternalIssuer) #Bisque {
-      value: String
+    VALUE_OBJECT(ChangeDetail) #Bisque {
+      old: String
+      new: String
     }
 
-    VALUE_OBJECT(UserIdentifier) #Bisque {
-      userId: UUID
+    ENTITY(PlatformRoleAssignment) #lightblue {
+      id: String
+      userId: String
+      role: PlatformRole
+      grantedBy: String?
+      grantedAt: DateTime
+      revokedAt: DateTime?
+      createdAt: DateTime
     }
 
-    ENUM(UserStatus) #SandyBrown {
-      ACTIVE,
-      INACTIVE,
-      SUSPENDED
+    ENUM(PlatformRole) #SandyBrown {
+      PLATFORM_ADMIN,
+      PLATFORM_SUPPORT,
+      PLATFORM_USER
     }
 
-    ENUM(SystemRole) #SandyBrown {
-      SYSTEM_ADMINISTRATOR,
-      REGULAR_USER
+    class AuthentikIdP << External System >> #lightyellow {
+      OIDC UserInfo endpoint
+      Admin API (user management)
+      --
+      Validates bearer tokens
+      Resolves user IDs by email
+      Syncs username changes
     }
 
     note right of User
       Invariants:
-      - (externalIssuer, externalSubjectId) pair must be unique
       - Email must be unique
       - Username must be unique
-      - SYSTEM_ADMINISTRATOR has platform-wide access
+      - Username must match ^[a-z0-9_-]{2,63}$
+      - ID comes from OIDC sub claim
+      - Deactivated accounts cannot re-register
     end note
 
-    User "1" o--> "1" UserIdentifier
-    User --> UserStatus
-    User --> SystemRole
+    note right of AuthentikIdP
+      Anti-Corruption Layer:
+      - TokenValidator adapter validates
+        tokens via /application/o/userinfo/
+      - AuthentikUserManager adapter
+        syncs data via /api/v3/core/users/
+    end note
 
-    User --> ExternalIssuer
-    User --> ExternalSubjectIdentifier
+    User "1" o--> "1" ID
+    User "1" --> "*" AuditLog : auditTrail
+    User "1" --> "*" PlatformRoleAssignment : roles
+    User --> PublicProfile : generates
+    TokenClaims ..> User : creates / updates
+    ProfileUpdate ..> User : patches
+    AuditLog *--> ChangeDetail : changes
+    PlatformRoleAssignment --> PlatformRole
+    AuthentikIdP ..> TokenClaims : issues
+    User ..> AuthentikIdP : authentikId
   }
 
   ' ==================================
@@ -86,16 +147,16 @@ rectangle "Kleff Hosting Domain" as Domain #line.dashed {
       status: WorkspaceStatus
       billingPlan: BillingPlan
       createdAt: DateTime
-      ownerId: UserIdentifier
+      ownerId: ID
     }
 
     ENTITY(WorkspaceMember) #lightblue {
       memberId: WorkspaceMemberIdentifier
       workspaceId: WorkspaceIdentifier
-      userId: UserIdentifier
+      userId: ID
       role: WorkspaceRole
       joinedAt: DateTime
-      invitedBy: UserIdentifier
+      invitedBy: ID
     }
 
     VALUE_OBJECT(WorkspaceIdentifier) #Bisque {
@@ -123,7 +184,7 @@ rectangle "Kleff Hosting Domain" as Domain #line.dashed {
     Workspace "1" --> "*" WorkspaceMember : members
     WorkspaceMember "1" o--> "1" WorkspaceMemberIdentifier
     WorkspaceMember "*" --> "1" Workspace : belongsTo
-    WorkspaceMember "*" --> "1" UserIdentifier : userId
+    WorkspaceMember "*" --> "1" ID : userId
   }
 
   ' ==================================
@@ -136,7 +197,7 @@ rectangle "Kleff Hosting Domain" as Domain #line.dashed {
       workspaceId: WorkspaceIdentifier
       name: String
       description: String
-      ownerId: UserIdentifier
+      ownerId: ID
       repositoryUrl: String
       branch: String
       dockerComposePath: String
@@ -149,10 +210,10 @@ rectangle "Kleff Hosting Domain" as Domain #line.dashed {
     ENTITY(ProjectCollaborator) #lightblue {
       collaboratorId: CollaboratorIdentifier
       projectId: ProjectIdentifier
-      userId: UserIdentifier
+      userId: ID
       role: CollaboratorRole
       permissions: Set<ProjectPermission>
-      invitedBy: UserIdentifier
+      invitedBy: ID
       invitedAt: DateTime
       acceptedAt: DateTime
     }
@@ -216,13 +277,13 @@ rectangle "Kleff Hosting Domain" as Domain #line.dashed {
     Project "1" o--> "1" ProjectIdentifier
     Project "1" --> "*" ProjectCollaborator : collaborators
     Project "1" --> "1" ProjectStatus : status
-    Project "1" --> "1" UserIdentifier : ownerId
+    Project "1" --> "1" ID : ownerId
     Project "1" --> "0..1" GitWebhook : webhook
 
     ProjectCollaborator "*" --> "1" WorkspaceIdentifier : viaProjectWorkspace
     ProjectCollaborator "1" o--> "1" CollaboratorIdentifier
     ProjectCollaborator "*" --> "1" Project : belongsTo
-    ProjectCollaborator "1" --> "1" UserIdentifier : userId
+    ProjectCollaborator "1" --> "1" ID : userId
     ProjectCollaborator "1" --> "1" CollaboratorRole : role
     ProjectCollaborator "*" --> "*" ProjectPermission : permissions
   }
@@ -237,7 +298,7 @@ rectangle "Kleff Hosting Domain" as Domain #line.dashed {
       projectId: ProjectIdentifier
       version: String
       commitHash: String
-      deployedBy: UserIdentifier
+      deployedBy: ID
       nodeId: NodeIdentifier
       triggeredBy: DeploymentTrigger
       status: DeploymentStatus
@@ -403,7 +464,7 @@ rectangle "Kleff Hosting Domain" as Domain #line.dashed {
 
     AGGREGATE(ReservedAllocation) #lightblue {
         allocationId: ReservedAllocationIdentifier
-        userId: UserIdentifier
+        userId: ID
         workspaceId: WorkspaceIdentifier
         projectId: ProjectIdentifier
         cpuCores: Double
@@ -495,11 +556,11 @@ rectangle "Kleff Hosting Domain" as Domain #line.dashed {
   ' Cross-BC Relationships
   ' ===============================
 
-  ProjectCollaborator o--> UserIdentifier : userId
-  Project o--> UserIdentifier : ownerId
+  ProjectCollaborator o--> ID : userId
+  Project o--> ID : ownerId
 
   Deployment o--> ProjectIdentifier : projectId
-  Deployment o--> UserIdentifier : deployedBy
+  Deployment o--> ID : deployedBy
 
   Metrics o--> ProjectIdentifier : resourceId (when PROJECT)
   LogEntry o--> ProjectIdentifier : resourceId (when PROJECT)
@@ -509,11 +570,11 @@ rectangle "Kleff Hosting Domain" as Domain #line.dashed {
   UsageRecord o--> ContainerIdentifier : containerId
   ReservedAllocation o--> ProjectIdentifier : projectId
 
-  Invoice o--> UserIdentifier : billedTo
+  Invoice o--> ID : billedTo
   InvoiceItem o--> ProjectIdentifier : projectId
-  
+
   Project o--> WorkspaceIdentifier : workspaceId
-  WorkspaceMember o--> UserIdentifier : userId
+  WorkspaceMember o--> ID : userId
 
   ReservedAllocation o--> WorkspaceIdentifier : workspaceId
   Invoice o--> WorkspaceIdentifier : billedToWorkspace

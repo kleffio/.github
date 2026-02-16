@@ -12,11 +12,11 @@ Person(collaborator, "Collaborator", "A developer invited to contribute to proje
 Person(admin, "System Admin", "An admin who oversees the platform operations, nodes, and billing.")
 
 ' ==== External Systems ====
-System_Ext(payment_gateway, "Payment Gateway", "External system for processing online transactions (e.g., Stripe, PayPal)")
+System_Ext(payment_gateway, "Payment Gateway", "External system for processing online transactions using Stripe")
 System_Ext(auth_server, "Authentik IDP", "Central OIDC/OAuth2 Identity Provider for Kleff Hosting")
-System_Ext(secret_manager, "Secrets Manager", "Manages and provides secrets and environment variables (e.g., Doppler)")
-System_Ext(emailing_service, "Email Service", "Sends transactional emails (e.g., Brevo, SendGrid)")
-System_Ext(git_provider, "Git Provider", "Hosts source repositories and sends webhooks (e.g., GitHub, GitLab)")
+System_Ext(secret_manager, "Secrets Manager", "Manages and provides secrets and environment variables using Doppler")
+System_Ext(emailing_service, "Email Service", "Sends transactional emails using Authentik's email server")
+System_Ext(git_provider, "Git Provider", "Hosts source repositories and sends webhooks using GitHub")
 
 ' ==== System ====
 System(kleff, "Kleff Hosting", "PaaS that enables developers to deploy Docker Compose projects from Git repositories with team collaboration.")
