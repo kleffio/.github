@@ -187,105 +187,124 @@ rectangle "Kleff Hosting Domain" as Domain #line.dashed {
     WorkspaceMember "*" --> "1" ID : userId
   }
 
-  ' ==================================
-  ' Project Management BC
+ ' ==================================
+  ' Project Management BC (UPDATED PER SQL SCHEMA)
   ' ==================================
   package "Project Management BC\n(Project Lifecycle & Collaboration)" #D1C4E9 {
 
     AGGREGATE_ROOT(Project) #lightblue {
-      projectId: ProjectIdentifier
-      workspaceId: WorkspaceIdentifier
+      projectId: UUID
       name: String
-      description: String
-      ownerId: ID
-      repositoryUrl: String
-      branch: String
-      dockerComposePath: String
-      environmentVariables: Map<String, String>
-      status: ProjectStatus
-      createdAt: DateTime
-      updatedAt: DateTime
+      description: Text
+      ownerId: String
+      environmentVariables: JSONB
+      projectStatus: String
+      createdDate: Timestamp
+      updatedDate: Timestamp
+    }
+
+    AGGREGATE(Invitation) #lightblue {
+      id: Integer
+      projectId: String
+      inviterId: String
+      inviteeEmail: String
+      role: RoleEnum
+      status: InvitationStatus
+      expiresAt: Timestamp
+      createdAt: Timestamp
+      updatedAt: Timestamp
     }
 
     ENTITY(ProjectCollaborator) #lightblue {
-      collaboratorId: CollaboratorIdentifier
-      projectId: ProjectIdentifier
-      userId: ID
-      role: CollaboratorRole
-      permissions: Set<ProjectPermission>
-      invitedBy: ID
-      invitedAt: DateTime
-      acceptedAt: DateTime
+      id: Integer
+      projectId: String
+      userId: String
+      role: RoleEnum
+      status: CollaboratorStatus
+      invitedBy: String
+      invitedAt: Timestamp
+      acceptedAt: Timestamp
+      expiresAt: Timestamp
+      lastAccessedAt: Timestamp
+      createdAt: Timestamp
+      updatedAt: Timestamp
     }
 
-    VALUE_OBJECT(ProjectIdentifier) #Bisque {
-      projectId: UUID
+    ENTITY(FeatureFlag) #lightgrey {
+      id: Integer
+      flagKey: String
+      enabled: Boolean
+      description: Text
     }
 
-    VALUE_OBJECT(CollaboratorIdentifier) #Bisque {
-      collaboratorId: UUID
+    ENTITY(AuthorizationAuditLog) #lightgrey {
+      id: BigInt
+      userId: String
+      projectId: String
+      action: String
+      resourceType: String
+      resourceId: String
+      permissionChecked: String
+      authorizationResult: AuthResultEnum
+      shadowMode: Boolean
+      ipAddress: String
+      userAgent: Text
+      requestId: String
+      changes: JSON
+      createdAt: Timestamp
     }
 
-    ENUM(ProjectStatus) #SandyBrown {
-      ACTIVE,
-      PAUSED,
-      ARCHIVED,
-      DELETED
-    }
-
-    ENUM(CollaboratorRole) #SandyBrown {
-      OWNER,
-      ADMIN,
-      DEVELOPER,
+    ENUM(RoleEnum) #SandyBrown {
+      OWNER
+      ADMIN
+      DEVELOPER
       VIEWER
     }
 
-    ENUM(ProjectPermission) #SandyBrown {
-      READ_PROJECT,
-      WRITE_PROJECT,
-      DEPLOY,
-      MANAGE_ENV_VARS,
-      VIEW_LOGS,
-      VIEW_METRICS,
-      MANAGE_COLLABORATORS,
-      DELETE_PROJECT,
-      MANAGE_BILLING
+    ENUM(InvitationStatus) #SandyBrown {
+      PENDING
+      ACCEPTED
+      EXPIRED
     }
 
-    VALUE_OBJECT(GitWebhook) #Bisque {
-      webhookUrl: String
-      secret: String
-      enabled: Boolean
+    ENUM(CollaboratorStatus) #SandyBrown {
+      PENDING
+      ACCEPTED
+      REFUSED
+      EXPIRED
+    }
+
+    ENUM(AuthResultEnum) #SandyBrown {
+      ALLOW
+      DENY
+      SHADOW_ALLOW
+      SHADOW_DENY
     }
 
     note right of Project
-      Invariant:
-      - Must have exactly one OWNER
-      - Repository URL must be valid Git URL
-      - Name must be unique per owner
-      - Docker Compose path must be valid
+      Invariants:
+      - Project name is NOT NULL
+      - Uses JSONB for environment variables
     end note
 
     note right of ProjectCollaborator
-      Invariant:
-      - OWNER has all permissions
-      - Cannot remove last OWNER
-      - User cannot be added twice to same project
-      - Permissions must match role constraints
+      Invariants:
+      - Unique constraint on (projectId, userId)
+      - Tracks last access for security auditing
     end note
 
-    Project "1" o--> "1" ProjectIdentifier
-    Project "1" --> "*" ProjectCollaborator : collaborators
-    Project "1" --> "1" ProjectStatus : status
-    Project "1" --> "1" ID : ownerId
-    Project "1" --> "0..1" GitWebhook : webhook
-
-    ProjectCollaborator "*" --> "1" WorkspaceIdentifier : viaProjectWorkspace
-    ProjectCollaborator "1" o--> "1" CollaboratorIdentifier
-    ProjectCollaborator "*" --> "1" Project : belongsTo
-    ProjectCollaborator "1" --> "1" ID : userId
-    ProjectCollaborator "1" --> "1" CollaboratorRole : role
-    ProjectCollaborator "*" --> "*" ProjectPermission : permissions
+    Project "1" *-- "*" ProjectCollaborator : consists of
+    Project "1" *-- "*" Invitation : tracks
+    ProjectCollaborator --> RoleEnum
+    Invitation --> RoleEnum
+    Invitation --> InvitationStatus
+    ProjectCollaborator --> CollaboratorStatus
+    AuthorizationAuditLog --> AuthResultEnum
+    
+    ' Links to Identity
+    Project --> ID : ownerId
+    ProjectCollaborator --> ID : userId
+    Invitation --> ID : inviterId
   }
 
   ' ==================================

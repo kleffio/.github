@@ -36,7 +36,6 @@ Collab -- UC14
 Dev -- UC15
 
 ' Internal relationships
-UC10 ..> UC11 : <<includes>>
 UC12 ..> UC13 : <<includes>>
 UC14 ..> UC13 : <<includes>>
 
