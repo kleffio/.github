@@ -8,7 +8,7 @@ title Level 3 - Component Diagram for Project Management Service (Project Lifecy
 ' ==== External Containers / Systems (from C4L2) ====
 Container(spa, "Kleff Dashboard (SPA)", "TypeScript, React", "Frontend for project owners & collaborators.")
 Container(identity_svc, "Identity & Access Service", "Java/Go", "Manages users, roles, and tenants.")
-ContainerDb(project_db, "project-db", "PostgreSQL", "Stores Projects, Collaborators, permissions, and webhook configuration.")
+ContainerDb(project_db, "project-db", "PostgreSQL", "Stores Projects, Invitations, Collaborators, Feature Flags, and Audit Logs.")
 System_Ext(email_service, "Email Service", "SMTP / Email API", "Sends collaboration invitations and notifications.")
 System_Ext(git_provider, "Git Provider", "GitHub/GitLab", "Hosts repositories and webhooks.")
 
@@ -35,9 +35,18 @@ Container_Boundary(project_svc, "Project Management Service") {
   Component(collab_domain, "ProjectCollaborator Entity", "Domain Model", "Represents membership of a user in a project with a role and fine-grained permissions.")
 
 
-  ' ---- Infrastructure / Adapters ----
-  Component(project_repo, "ProjectRepository", "Repository Adapter", "Persists and retrieves Project aggregates and collaborator entities from project-db.")
+  ' ---- Infrastructure / Adapters (Repositories) ----
+  Component(project_repo, "ProjectRepository", "Repository Adapter", "Persists and retrieves Project aggregates (projects table).")
 
+  Component(collab_repo, "CollaboratorRepository", "Repository Adapter", "Manages project membership and unique constraints (collaborators table).")
+
+  Component(invite_repo, "InvitationRepository", "Repository Adapter", "Handles the lifecycle of project invites (invitations table).")
+
+  Component(feature_flag_repo, "FeatureFlagRepository", "Repository Adapter", "Retrieves authorization toggle states (feature_flags table).")
+
+  Component(audit_repo, "AuthorizationAuditRepository", "Repository Adapter", "Records authorization decisions and changes (authorization_audit_logs table).")
+
+  ' ---- Infrastructure / Adapters (Clients) ----
   Component(identity_client, "IdentityServiceClient", "Integration Adapter", "Looks up users by ID/email and validates their existence in the Identity & Access BC.")
 
   Component(email_adapter, "ProjectNotification", "Integration Adapter", "Sends collaboration invitations and project notifications via the application")
@@ -64,16 +73,24 @@ Rel(project_app_svc, project_repo, "Creates/updates Projects & webhook config", 
 Rel(project_app_svc, project_domain, "Applies domain logic", "Method calls")
 Rel(project_app_svc, git_integration, "Configures webhooks on repository", "HTTPS/API")
 
-Rel(collab_app_svc, project_repo, "Updates collaborator roles & permissions", "Repository API")
+Rel(collab_app_svc, collab_repo, "Updates collaborator roles & permissions", "Repository API")
+Rel(collab_app_svc, invite_repo, "Creates/Updates invitations", "Repository API")
 Rel(collab_app_svc, collab_domain, "Applies collaboration domain rules", "Method calls")
 Rel(collab_app_svc, identity_client, "Resolves invitee user IDs", "JSON/REST/HTTPS")
 Rel(collab_app_svc, email_adapter, "Sends invitations to collaborators", "Send email")
 
-Rel(project_permission_svc, project_repo, "Reads project collaborators & permissions", "Repository API")
+Rel(project_permission_svc, collab_repo, "Reads project collaborators & permissions", "Repository API")
+Rel(project_permission_svc, feature_flag_repo, "Checks shadow/enforce modes", "Repository API")
+Rel(project_permission_svc, audit_repo, "Logs auth decisions", "Repository API")
 Rel(project_permission_svc, collab_domain, "Evaluates project-level permissions", "Method calls")
 
 ' ==== Adapters -> External Systems ====
-Rel(project_repo, project_db, "Reads/Writes Projects & Collaborators", "SQL")
+Rel(project_repo, project_db, "Reads/Writes projects", "SQL")
+Rel(collab_repo, project_db, "Reads/Writes collaborators", "SQL")
+Rel(invite_repo, project_db, "Reads/Writes invitations", "SQL")
+Rel(feature_flag_repo, project_db, "Reads feature_flags", "SQL")
+Rel(audit_repo, project_db, "Writes authorization_audit_logs", "SQL")
+
 Rel(identity_client, identity_svc, "Reads User info from Identity & Access BC", "JSON/REST/HTTPS")
 Rel(git_integration, git_provider, "Configures webhooks & repo metadata", "HTTPS/Git API")
 

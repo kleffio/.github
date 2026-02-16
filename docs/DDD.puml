@@ -194,13 +194,10 @@ rectangle "Kleff Hosting Domain" as Domain #line.dashed {
 
     AGGREGATE_ROOT(Project) #lightblue {
       projectId: ProjectIdentifier
-      workspaceId: WorkspaceIdentifier
       name: String
       description: String
       ownerId: ID
-      repositoryUrl: String
       branch: String
-      dockerComposePath: String
       environmentVariables: Map<String, String>
       status: ProjectStatus
       createdAt: DateTime
@@ -261,9 +258,7 @@ rectangle "Kleff Hosting Domain" as Domain #line.dashed {
     note right of Project
       Invariant:
       - Must have exactly one OWNER
-      - Repository URL must be valid Git URL
       - Name must be unique per owner
-      - Docker Compose path must be valid
     end note
 
     note right of ProjectCollaborator
