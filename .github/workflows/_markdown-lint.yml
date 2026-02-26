@@ -27,7 +27,7 @@ jobs:
           test -f ".org-config/configs/.markdownlint.jsonc"
 
       - name: Run Markdownlint
-        uses: DavidAnson/markdownlint-cli2-action@v17
+        uses: DavidAnson/markdownlint-cli2-action@v20
         with:
           config: .org-config/configs/.markdownlint.jsonc
           globs: |
