@@ -1,21 +1,26 @@
-name: Render PlantUML Diagrams
+name: PlantUML -> GitHub Pages
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
     paths:
       - "**/*.puml"
       - "**/*.plantuml"
-      - ".github/workflows/render-plantuml.yml"
+      - ".github/workflows/plantuml-pages.yml"
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
 
 jobs:
-  render:
+  build:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -26,7 +31,7 @@ jobs:
           distribution: temurin
           java-version: "17"
 
-      - name: Install Graphviz (dot)
+      - name: Install Graphviz
         run: |
           sudo apt-get update
           sudo apt-get install -y graphviz
@@ -39,19 +44,42 @@ jobs:
 
       - name: Render diagrams to SVG
         run: |
-          mkdir -p docs/diagrams
-          # render each file; if one fails, print it and continue (optional)
+          rm -rf site
+          mkdir -p site/diagrams
           while IFS= read -r file; do
             echo "Rendering $file"
-            java -DPLANTUML_DOT=/usr/bin/dot -jar tools/plantuml.jar -tsvg "$file" -o "$(pwd)/docs/diagrams" || {
+            java -DPLANTUML_DOT=/usr/bin/dot -jar tools/plantuml.jar -tsvg "$file" -o "$(pwd)/site/diagrams" || {
               echo "FAILED: $file"
             }
           done < <(find . -type f \( -name "*.puml" -o -name "*.plantuml" \))
 
-      - name: Commit rendered diagrams
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add docs/diagrams
-          git commit -m "chore(diagrams): render PlantUML" || echo "No changes to commit"
-          git push
+          # Simple index so your teacher can browse
+          cat > site/index.html <<'HTML'
+          <!doctype html>
+          <html>
+            <head><meta charset="utf-8"><title>PlantUML Diagrams</title></head>
+            <body>
+              <h1>PlantUML Diagrams</h1>
+              <ul>
+          HTML
+          for f in site/diagrams/*.svg; do
+            name="$(basename "$f")"
+            echo "<li><a href=\"diagrams/$name\">$name</a></li>" >> site/index.html
+          done
+          echo "</ul></body></html>" >> site/index.html
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
