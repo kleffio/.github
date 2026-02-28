@@ -64,11 +64,14 @@ jobs:
             echo
           } > docs/diagrams/README.md
 
+          # Generate index
           for f in docs/diagrams/*.svg; do
             [ -e "$f" ] || continue
             name="$(basename "$f")"
             base="${name%.svg}"
+
             anchor="$(echo "$base" | tr '[:upper:]' '[:lower:]' | sed -E 's/[^a-z0-9]+/-/g; s/^-|-$//g')"
+
             echo "- [$base](#$anchor)" >> docs/diagrams/README.md
           done
 
@@ -80,13 +83,18 @@ jobs:
             echo
           } >> docs/diagrams/README.md
 
+          # Generate embedded diagrams with URL-encoded filenames
           for f in docs/diagrams/*.svg; do
             [ -e "$f" ] || continue
             name="$(basename "$f")"
             base="${name%.svg}"
+
             echo "### $base" >> docs/diagrams/README.md
             echo >> docs/diagrams/README.md
-            echo "![]($name)" >> docs/diagrams/README.md
+
+            safe="$(python3 -c "import urllib.parse, sys; print(urllib.parse.quote(sys.argv[1]))" "$name")"
+
+            echo "![]($safe)" >> docs/diagrams/README.md
             echo >> docs/diagrams/README.md
           done
 
