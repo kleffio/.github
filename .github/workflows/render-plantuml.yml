@@ -1,4 +1,4 @@
-name: Render PlantUML + README -> PR
+name: Render PlantUML + README -> bot branch
 
 on:
   workflow_dispatch:
@@ -11,7 +11,6 @@ on:
 
 permissions:
   contents: write
-  pull-requests: write
 
 jobs:
   render:
@@ -19,6 +18,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+          fetch-depth: 0
 
       - name: Install Java
         uses: actions/setup-java@v4
@@ -44,7 +46,6 @@ jobs:
 
           while IFS= read -r file; do
             echo "Rendering $file"
-            # PlantUML outputs to the directory passed by -o (it uses the base file name)
             java -DPLANTUML_DOT=/usr/bin/dot -jar tools/plantuml.jar -tsvg "$file" -o "$(pwd)/docs/diagrams" || {
               echo "FAILED: $file"
             }
@@ -63,7 +64,6 @@ jobs:
             echo
           } > docs/diagrams/README.md
 
-          # Index list
           for f in docs/diagrams/*.svg; do
             [ -e "$f" ] || continue
             name="$(basename "$f")"
@@ -80,7 +80,6 @@ jobs:
             echo
           } >> docs/diagrams/README.md
 
-          # Embedded diagrams
           for f in docs/diagrams/*.svg; do
             [ -e "$f" ] || continue
             name="$(basename "$f")"
@@ -91,14 +90,23 @@ jobs:
             echo >> docs/diagrams/README.md
           done
 
-      - name: Create/Update PR with rendered diagrams + README
-        uses: peter-evans/create-pull-request@v7
-        with:
-          branch: bot/render-plantuml
-          title: "chore(diagrams): render PlantUML + README"
-          commit-message: "chore(diagrams): render PlantUML + README"
-          body: |
-            Auto-generated rendered PlantUML diagrams in `docs/diagrams/` plus an embedded `README.md` index.
-          labels: diagrams
-          add-paths: |
-            docs/diagrams/**
+      - name: Commit rendered diagrams to bot branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git checkout -B bot/render-plantuml
+          git add docs/diagrams/**
+
+          git commit -m "chore(diagrams): render PlantUML + README" || echo "No changes to commit"
+
+      - name: Push bot branch
+        run: |
+          git push --force origin bot/render-plantuml
+
+      - name: Links
+        run: |
+          echo "View rendered README:"
+          echo "https://github.com/${{ github.repository }}/blob/bot/render-plantuml/docs/diagrams/README.md"
+          echo "Open a PR to merge into main:"
+          echo "https://github.com/${{ github.repository }}/pull/new/bot/render-plantuml"
