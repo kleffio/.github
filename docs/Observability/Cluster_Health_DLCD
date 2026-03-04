@@ -1,0 +1,61 @@
+@startuml Kleff Hosting - Observability DLCD Final
+allowmixing
+
+package "internal/core/domain" {
+    class "AggregatedMetrics" as DomainMetrics <<Struct>> {
+        + Overview: ClusterOverview
+        + Nodes: []NodeMetric
+        + CPUUtilization: ResourceUtilization
+        + SystemUptime: float64
+    }
+    
+    class "MetricCard" as MetricCard <<Struct>> {
+        + Title: string
+        + Value: string
+        + Status: string
+        + Sparkline: []TimeSeriesDataPoint
+    }
+}
+
+package "internal/core/ports" {
+    interface MetricsRepository <<Interface>> {
+        + GetAllMetrics(ctx, duration): (*AggregatedMetrics, error)
+        + GetClusterOverview(ctx): (*ClusterOverview, error)
+        + GetNodesMetric(ctx, duration): (*MetricCard, error)
+        + GetSystemUptime(ctx): (float64, error)
+        ' ... (Supports 10+ specific metric getters)
+    }
+}
+
+package "internal/adapters/out/prometheus" {
+    class "prometheusClient" as PromAdapter <<Adapter>> {
+        - httpClient: *http.Client
+        - baseURL: string
+        --
+        + NewPrometheusClient(url): MetricsRepository
+        + GetAllMetrics(ctx): (*AggregatedMetrics, error)
+        - queryPrometheus(ctx, query): (*PrometheusResponse, error)
+        - queryPrometheusRange(ctx, query, duration): (*PrometheusResponse, error)
+        - extractValue(val): (float64, error)
+        - extractTimeSeries(values): []TimeSeriesDataPoint
+        - determineStatus(val, warm, crit): string
+    }
+}
+
+package "internal/core/services" {
+    class "metricsService" as CoreService <<Service>> {
+        - metricsRepo: MetricsRepository
+        --
+        + NewMetricsService(repo): MetricsService
+        + GetAllMetrics(ctx, duration): (*AggregatedMetrics, error)
+    }
+}
+
+' Relationships
+PromAdapter ..|> MetricsRepository : implements (Implicit)
+CoreService o-- MetricsRepository : uses
+
+' Dependency on Domain
+MetricsRepository ..> DomainMetrics : returns
+PromAdapter ..> MetricCard : creates
+@enduml
