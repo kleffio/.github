@@ -1,0 +1,79 @@
+@startuml View Application Logs - Full Journey
+autonumber
+skinparam Style strictuml
+skinparam SequenceMessageAlignment center
+skinparam MaxMessageSize 250
+
+actor "Developer" as User
+
+box "Presentation Layer (React)" #FAFAFA
+    participant "DashboardNav" as Nav
+    participant "SimpleLogsViewer" as Page
+    participant "api/getContainerLogs.ts" as Client
+end box
+
+box "Infrastructure Inbound (Go)" #F5F5F5
+    participant "LogsHandler\n(Gin)" as Handler
+end box
+
+box "Application & Domain" #E3F2FD
+    participant "LogsService\n(Core)" as Service
+end box
+
+box "Infrastructure Outbound" #FFF9C4
+    participant "LokiClient\n(Adapter)" as Adapter
+end box
+
+participant "Grafana Loki API" as Loki
+
+== Phase 1: Navigation & Initialization ==
+
+User -> Nav : Clicks "Logs"
+Nav -> Page : Route Change / Mount
+activate Page
+
+note over Page : useEffect() initializes\npolling interval (10s)
+
+== Phase 2: The Data Request ==
+
+Page -> Client : getContainerLogs(projId, containers, 200, "1h")
+activate Client
+
+Client -> Handler : GET /api/v1/logs?limit=200&duration=1h
+activate Handler
+
+Handler -> Service : GetProjectContainerLogs(ctx, projId, names, 200, "1h")
+activate Service
+
+Service -> Adapter : QueryLogs(ctx, projId, names, 200, "1h")
+activate Adapter
+
+Adapter -> Loki : GET /loki/api/v1/query_range (LogQL)
+activate Loki
+Loki --> Adapter : 200 OK (JSON Stream)
+deactivate Loki
+
+Adapter --> Service : []domain.LogEntry
+deactivate Adapter
+
+Service --> Handler : []domain.LogEntry
+deactivate Service
+
+Handler --> Client : 200 OK (JSON Array)
+deactivate Handler
+
+Client --> Page : logsData
+deactivate Client
+
+Page -> User : Render Log Lines in Terminal UI
+
+== Phase 3: Auto-Refresh Cycle ==
+
+loop every 10 seconds
+    Page -> Client : fetch updates
+    Client -> Handler : GET /api/v1/logs...
+    Handler --> Page : New log entries
+    Page -> Page : Update terminal state
+end
+
+@enduml
