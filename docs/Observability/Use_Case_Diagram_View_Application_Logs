@@ -1,0 +1,30 @@
+@startuml View Application Logs - Use Case Diagram
+left to right direction
+skinparam shadowing false
+skinparam packageStyle rectangle
+
+actor "Developer" as Dev
+
+rectangle "Kleff Hosting Platform" {
+  usecase "UC-30: View Application Logs" as UC30
+  
+  usecase "Filter by Time Duration" as UC30_Time
+  usecase "Filter by Log Level" as UC30_Level
+
+  Dev -- UC30
+  
+  ' Extends relationships (Filtering is optional)
+  UC30 <.. UC30_Time : <<extend>>
+  UC30 <.. UC30_Level : <<extend>>
+
+  note bottom of UC30_Level
+    Filter by types:
+    INFO, WARNING, ERROR, etc.
+  end note
+
+  note bottom of UC30_Time
+    Filter by range:
+    Last 1h, 24h, Custom, etc.
+  end note
+}
+@enduml
