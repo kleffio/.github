@@ -1,0 +1,58 @@
+@startuml View Application Logs - DLCD
+skinparam linetype polyline
+skinparam shadowing false
+allowmixing
+
+package "internal/core/domain" #E3F2FD {
+    class "LogEntry" as DomainLog <<Struct>> {
+        + Timestamp: string
+        + Log: string
+        + Labels: "Map<string, string>"
+    }
+}
+
+package "internal/core/ports" #E3F2FD {
+    interface "LogsRepository" as LogsRepo <<Interface>> {
+        + QueryLogs(ctx, projectID, containers, limit, duration): ([]LogEntry, error)
+    }
+}
+
+package "internal/adapters/in/http" #F5F5F5 {
+    class "ProjectLogsRequest" as LogsReq <<Struct>> {
+        + ProjectID: string
+        + ContainerNames: []string
+        + Limit: int
+        + Duration: string
+    }
+    
+    class "LogsHandler" as Handler <<Controller>> {
+        - logsService: LogsService
+        + GetLogs(c: *gin.Context)
+    }
+}
+
+package "internal/adapters/out/repository/loki" #FFF9C4 {
+    class "LokiClient" as LokiAdapter <<Adapter>> {
+        - httpClient: *http.Client
+        - baseURL: string
+        --
+        + QueryLogs(ctx, ...): ([]LogEntry, error)
+        - buildLogQL(projectID, containers): string
+    }
+}
+
+package "internal/core/services" #E3F2FD {
+    class "LogsService" as CoreService <<Service>> {
+        - logsRepo: LogsRepository
+        --
+        + GetProjectContainerLogs(ctx, ...): ([]LogEntry, error)
+    }
+}
+
+' Relationships
+LokiAdapter ..|> LogsRepo : implements
+CoreService o-- LogsRepo : uses
+Handler --> CoreService : calls
+CoreService ..> DomainLog : returns
+LogsReq ..> Handler : parses into
+@enduml
