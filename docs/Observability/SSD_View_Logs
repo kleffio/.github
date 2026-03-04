@@ -1,0 +1,29 @@
+@startuml View Application Logs - SSD
+skinparam Style strictuml
+autonumber
+
+actor "Developer" as User
+participant "Kleff Hosting Platform" as System
+
+User -> System: Request Container Logs View
+activate System
+
+System -> System: Validating log access (VIEW_LOGS)
+System -->> User: Display Logs Viewer (Initial state)
+
+loop every 10 seconds (Auto-Refresh)
+    System -> System: Fetching latest entries (limit=200, duration="1h")
+    
+    alt Success: Logs Available
+        System -->> User: Update View (Live Log Stream)
+    else Success: No Logs Found
+        System -->> User: Display "No logs available" empty state
+    else API Timeout / Error
+        System -->> User: Display "Unable to retrieve logs" error
+    end
+end
+
+User -> System: Request Log Export
+System -->> User: Provide container_logs.txt download
+deactivate System
+@enduml
