@@ -12,12 +12,12 @@
 - [IdentityAndAccess](#identityandaccess)
 - [Kleff Developer Deployment](#kleff-developer-deployment)
 - [Kleff Hosting - Billing Use Cases](#kleff-hosting-billing-use-cases)
+- [Kleff Hosting - C4 Level 3 Observability Final](#kleff-hosting-c4-level-3-observability-final)
 - [Kleff Hosting - Observability Use Cases](#kleff-hosting-observability-use-cases)
 - [Kleff Hosting - Platform Admin Use Cases](#kleff-hosting-platform-admin-use-cases)
 - [Kleff Hosting C4L3 - Billing](#kleff-hosting-c4l3-billing)
 - [Kleff Hosting C4L3 - Deployment](#kleff-hosting-c4l3-deployment)
 - [Kleff Hosting C4L3 - Identity & Access](#kleff-hosting-c4l3-identity-access)
-- [Kleff Hosting C4L3 - Observability](#kleff-hosting-c4l3-observability)
 - [Kleff Hosting C4L3 - Project Management](#kleff-hosting-c4l3-project-management)
 - [Kleff Hosting DDD](#kleff-hosting-ddd)
 - [ProjectManagement](#projectmanagement)
@@ -67,6 +67,10 @@
 
 ![](Kleff%20Hosting%20-%20Billing%20Use%20Cases.svg)
 
+### Kleff Hosting - C4 Level 3 Observability Final
+
+![](Kleff%20Hosting%20-%20C4%20Level%203%20Observability%20Final.svg)
+
 ### Kleff Hosting - Observability Use Cases
 
 ![](Kleff%20Hosting%20-%20Observability%20Use%20Cases.svg)
@@ -86,10 +90,6 @@
 ### Kleff Hosting C4L3 - Identity & Access
 
 ![](Kleff%20Hosting%20C4L3%20-%20Identity%20%26%20Access.svg)
-
-### Kleff Hosting C4L3 - Observability
-
-![](Kleff%20Hosting%20C4L3%20-%20Observability.svg)
 
 ### Kleff Hosting C4L3 - Project Management
 
