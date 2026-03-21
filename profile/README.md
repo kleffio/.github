@@ -45,8 +45,6 @@
 | [Security Policy](https://github.com/kleffio/.github/blob/main/SECURITY.md) | Responsible disclosure process |
 | [Vision](https://github.com/kleffio/.github/blob/main/VISION.md) | Roadmap and design philosophy |
 
-Licensed under the **Kleff Public License v1.0** (based on Apache 2.0).
-
 ---
 
 <p align="center">
