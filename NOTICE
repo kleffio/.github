@@ -1,20 +1,39 @@
 Kleff Notice
-------------
+============
 
-This product includes software developed by Kleff
+This product includes software developed by Kleff Hosting.
 https://kleff.io
 
 Licensed under the Kleff Public License v1.0,
-based on the Apache License, Version 2.0.
+which is based on the Apache License, Version 2.0.
+
+A copy of the Kleff Public License v1.0 is included in this
+repository as the LICENSE file, and in full at:
+.github/LICENSES/LicenseRef-Kleff-Public-License-1.0.txt
 
 ---------------------------------------------------------------------
 
 Attribution
 -----------
-Build. Host. Scale. Your Way.
-© 2025 Kleff Hosting
+"Build. Host. Scale. Your Way."
+Copyright 2025 Kleff Hosting
 
-You are free to use, modify, and distribute this software under the terms
-of the Kleff Public License v1.0.
-Use of the Kleff name or logo for commercial hosting services without
-permission is prohibited.
+You are free to use, modify, and distribute this software under
+the terms of the Kleff Public License v1.0, subject to the
+following restriction:
+
+  You may not offer Kleff or any substantially similar derivative
+  as a hosted or managed service to third parties without explicit
+  written permission from Kleff Hosting.
+
+Use of the Kleff name or logo in commercial hosting services
+without permission is prohibited. See TRADEMARKS.md for full
+trademark usage guidelines.
+
+---------------------------------------------------------------------
+
+Third-Party Notices
+-------------------
+This software may include third-party components. See the
+individual service directories for dependency disclosures and
+their respective licenses.

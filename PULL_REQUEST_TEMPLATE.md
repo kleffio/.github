@@ -1,123 +1,121 @@
-# 🚀 Pull Request Overview
+# Pull Request
 
-## 📌 Summary
+## Summary
+
 <!--
-Provide a clear, concise description of what this PR does.
+Concise description of what this PR does and why.
 Example:
-- Adds new API endpoint for container lifecycle
-- Fixes navbar dropdown animations
+- Adds container probe timeout configuration to the daemon
+- Fixes navbar dropdown animation regression on mobile
 - Improves CI caching for Go build steps
 -->
 
-## 🔗 Related Issues
+## Related Issues
+
 <!--
-Use keywords like "Closes #123" or "Fixes #456".
-If no linked issue, explain why this PR is necessary.
+Use keywords to link related issues: "Closes #123", "Fixes #456", "Refs #789"
+If there is no related issue, explain why this PR is necessary.
 -->
 
 Closes #
 
 ---
 
-# 🧪 Changes
+## Changes
 
-## ✅ What’s Included
-<!-- Bullet list of changes -->
+### What's Included
+
+<!-- Bullet list of changes made in this PR -->
+
 -
 
-## ❌ What’s Not Included
-<!-- List intentional exclusions to avoid confusion -->
+### What's Not Included
+
+<!-- Intentional exclusions — helps reviewers understand scope boundaries -->
+
 -
 
 ---
 
-# 🧪 Testing
+## Testing
 
-## 🔍 How Was This Tested?
+### How Was This Tested?
+
 <!--
-Explain how you tested the functionality.
-Examples:
-- Added unit tests for X
+Describe your testing approach:
+- Unit tests added for X
 - Tested locally with `docker compose up`
-- Verified UI responsiveness on mobile
+- Verified against staging environment
 -->
 
-## 🧪 Test Coverage
-<!-- Optional but recommended -->
-- [ ] Unit tests added/updated
-- [ ] Integration tests added/updated
-- [ ] End-to-end scenarios tested manually
+### Test Coverage
+
+- [ ] Unit tests added or updated
+- [ ] Integration tests added or updated
+- [ ] Manually tested end-to-end
 
 ---
 
-# 🧩 Breaking Changes
+## Breaking Changes
 
-Does this PR introduce **breaking changes**?
+Does this PR introduce breaking changes?
 
-- [ ] Yes  
-- [ ] No  
+- [ ] Yes
+- [ ] No
 
-If yes, describe the impact and migration steps:
-
----
-
-# 🔐 Security Considerations
-
-<!--
-Describe security-impacting changes, if any.
-Examples:
-- Updates OAuth flow
-- Touches auth middleware
-- Changes database permissions
--->
-
-- [ ] This PR affects authentication or authorization  
-- [ ] This PR touches secrets, tokens, or environment variables  
-- [ ] This PR affects infrastructure or deployment pipeline  
-
-If checked, explain:
+If yes, describe the impact and any required migration steps:
 
 ---
 
-# 📝 Documentation
+## Security Considerations
 
-Does this PR require updates to documentation?
+- [ ] This PR affects authentication or authorization logic
+- [ ] This PR touches secrets, tokens, or environment variables
+- [ ] This PR affects infrastructure, deployment pipelines, or network configuration
 
-- [ ] Yes  
-- [ ] No  
+If any box is checked, describe the security impact and any mitigations applied:
 
-If yes, update the relevant locations:
+---
 
-- [ ] `/docs`
+## Documentation
+
+Does this PR require documentation updates?
+
+- [ ] Yes
+- [ ] No
+
+If yes, check all that apply:
+
 - [ ] `README.md`
+- [ ] `ARCHITECTURE.md`
 - [ ] API reference
-- [ ] Architecture diagrams / C4 / DDD docs
+- [ ] Architecture diagrams (C4 / DDD)
+- [ ] `/docs`
 
 ---
 
-# 🎨 UI/UX Considerations (If Applicable)
+## UI/UX (If Applicable)
 
-- [ ] Includes new components
+- [ ] Includes new components or views
 - [ ] Changes styles or theme tokens
+- [ ] Responsive behavior verified
 - [ ] Requires design approval
-- [ ] Responsive behavior tested
 
-Screenshots / recordings (if applicable):
+Screenshots or recordings:
 
 ---
 
-# 📦 Checklist Before Merge
+## Pre-Merge Checklist
 
-- [ ] Follows project coding style
-- [ ] PR title follows **semantic format** (feat:, fix:, chore:, docs:, refactor:, test:)
+- [ ] PR title follows semantic format (`feat:`, `fix:`, `chore:`, `docs:`, `refactor:`, `test:`)
 - [ ] All CI checks passing
-- [ ] No debug logs or commented-out code
-- [ ] Dependencies reviewed
-- [ ] No sensitive information added
+- [ ] Code follows project style guidelines
+- [ ] No debug logs or commented-out code left in
+- [ ] Dependencies reviewed (no unnecessary additions)
+- [ ] No sensitive information included
 
 ---
 
-# 👤 Contributor Notes (Optional)
+## Reviewer Notes
 
-<!-- Add anything noteworthy for maintainers or reviewers -->
-
+<!-- Anything the reviewer should know, context, or areas to pay close attention to -->

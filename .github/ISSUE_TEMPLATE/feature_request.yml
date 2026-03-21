@@ -1,29 +1,74 @@
-name: "✨ Feature request"
-description: "Suggest an idea for Kleff"
+name: "Feature Request"
+description: "Propose a new feature or improvement for Kleff"
 labels: ["feature"]
 body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for taking the time to suggest an improvement. Well-scoped feature requests with clear use cases are much easier for us to evaluate and prioritize.
+
+        Please search existing issues and discussions before submitting to avoid duplicates.
+
+  - type: dropdown
+    id: component
+    attributes:
+      label: Affected Component
+      description: Which part of Kleff would this feature primarily affect?
+      options:
+        - Platform (API / backend)
+        - Panel (frontend dashboard)
+        - Gameserver Daemon
+        - Auth Service
+        - Infrastructure / Helm / Kubernetes
+        - SDKs / integrations
+        - Documentation
+        - Other / cross-cutting
+    validations:
+      required: true
+
   - type: textarea
     id: problem
     attributes:
-      label: Problem statement
-      description: What problem would this solve?
-      placeholder: "Explain the use-case or pain point"
+      label: Problem Statement
+      description: What problem would this feature solve? Describe the use case or pain point clearly.
+      placeholder: "As a developer deploying game servers, I need... because..."
     validations:
       required: true
 
   - type: textarea
     id: proposal
     attributes:
-      label: Proposed solution
-      description: Describe the feature and how it should work.
-      placeholder: "High-level approach, API, UX, etc."
+      label: Proposed Solution
+      description: Describe the feature and how it should work. Include API design, UX considerations, or architectural ideas where relevant.
+      placeholder: "High-level approach, API shape, UI flow, etc."
     validations:
       required: true
 
   - type: textarea
     id: alternatives
     attributes:
-      label: Alternatives considered
-      description: Any alternative solutions or features you’ve considered?
+      label: Alternatives Considered
+      description: What alternatives have you considered? Why is this approach better?
     validations:
       required: false
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority (your perspective)
+      description: How important is this feature to your use case?
+      options:
+        - Critical — blocking adoption or production use
+        - High — significantly improves my workflow
+        - Medium — nice to have
+        - Low — minor quality-of-life improvement
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: contribution
+    attributes:
+      label: Contribution
+      description: Are you willing to contribute this feature?
+      options:
+        - label: I am willing to submit a pull request for this feature

@@ -1,70 +1,70 @@
-# Kleff Organization Repository
-
-Welcome to the **Kleff `.github` repository** —  
-the central home for our community policies, guidelines, and organization-wide documentation.
+# Kleff — `.github` Repository
 
 > *Build. Host. Scale. Your Way.*
 
+This repository is the central source of truth for community governance, contribution standards, and organization-wide documentation across the Kleff ecosystem.
+
 ---
 
-## 📘 Purpose
+## Purpose
 
-This repository defines how the Kleff community operates and collaborates across all projects within the organization.
-
-It contains shared documentation such as:
+The `.github` repository defines how the Kleff community operates, collaborates, and contributes across all projects within the organization. Files stored here are automatically recognized by GitHub and applied as defaults across every repository under the `kleffio` organization.
 
 | File | Description |
-|------|--------------|
-| [`profile/README.md`](./profile/README.md) | The public-facing README displayed on the [Kleff GitHub Organization](https://github.com/kleffio) page. |
-| [`CONTRIBUTING.md`](./CONTRIBUTING.md) | Guidelines for contributing, submitting PRs, and coding style conventions. |
-| [`CODE_OF_CONDUCT.md`](./CODE_OF_CONDUCT.md) | Our community standards for respectful and inclusive behavior. |
-| [`SECURITY.md`](./SECURITY.md) | Responsible disclosure and vulnerability reporting policy. |
-| [`VISION.md`](./VISION.md) | Long-term goals, guiding principles, and ecosystem roadmap. |
-| [`LICENSE`](./LICENSE) | The license governing Kleff’s open-source repositories. |
+|------|-------------|
+| [`profile/README.md`](./profile/README.md) | Public-facing README displayed on the [Kleff GitHub Organization](https://github.com/kleffio) page |
+| [`CONTRIBUTING.md`](./CONTRIBUTING.md) | Contribution guidelines, workflow, branch conventions, and code style |
+| [`CODE_OF_CONDUCT.md`](./CODE_OF_CONDUCT.md) | Community standards for respectful and inclusive participation |
+| [`SECURITY.md`](./SECURITY.md) | Responsible disclosure policy, severity levels, and vulnerability reporting |
+| [`VISION.md`](./VISION.md) | Long-term goals, guiding principles, and ecosystem roadmap |
+| [`LICENSE`](./LICENSE) | The Kleff Public License v1.0 governing all open-source repositories |
+| [`TRADEMARKS.md`](./TRADEMARKS.md) | Trademark usage guidelines for the Kleff name and branding |
 
 ---
 
-## 🧭 How These Files Work
+## How Community Health Files Work
 
-GitHub automatically recognizes certain files inside `.github` to apply them across all repositories in the organization:
+GitHub automatically applies files from a `.github` repository as organization-wide defaults for any repository that does not define its own. This means:
 
-- **Community Health Files** — Code of Conduct, Contributing, and Security apply globally.  
-- **Profile Readme** — The `profile/README.md` is displayed publicly on the organization’s main page.  
-- **Workflow Templates** *(future use)* — You can later add reusable GitHub Actions or Issue Templates here for all Kleff repos.
-
----
-
-## 🧩 Related Repositories
-
-| Project | Description |
-|----------|--------------|
-| [kleff-auth](https://github.com/kleffio/kleff-auth) | Authentication and token management service. |
-| [kleff-container](https://github.com/kleffio/kleff-container) | Container lifecycle orchestration service. |
-| [kleff-api](https://github.com/kleffio/kleff-api) | API Gateway and shared service layer. |
-| [kleff-dashboard](https://github.com/kleffio/kleff-dashboard) | React + TypeScript dashboard for developers. |
+- **Code of Conduct**, **Contributing**, and **Security** policies apply globally by default.
+- Individual repositories may override these by including their own copies at the root level.
+- The `profile/README.md` is rendered publicly on the organization's main GitHub page.
+- Workflow templates and issue/PR templates added here are available across all Kleff repositories.
 
 ---
 
-## 🤝 Contributing
+## Ecosystem
 
-Please review our [Contributing Guide](./CONTRIBUTING.md) before submitting changes.  
-All contributions must follow the [Code of Conduct](./CODE_OF_CONDUCT.md).
+Kleff is an open-source hosting platform for web servers, game servers, and containerized workloads. The core components are:
 
-If you’d like to discuss ideas, open a [discussion on GitHub](https://github.com/orgs/kleffio/discussions).
-
----
-
-## 🛡️ Security
-
-If you discover a security issue, please follow our [Security Policy](./SECURITY.md).  
-**Do not disclose vulnerabilities publicly.**
+| Repository | Description |
+|------------|-------------|
+| [kleffio/platform](https://github.com/kleffio/platform) | Go backend control plane — API, auth, state management, event dispatch |
+| [kleffio/panel](https://github.com/kleffio/panel) | Next.js + TypeScript management dashboard |
+| [kleffio/gameserver-daemon](https://github.com/kleffio/gameserver-daemon) | Node-level daemon for container runtime management |
+| [kleffio/argocd](https://github.com/kleffio/argocd) | GitOps / ArgoCD application definitions for Kubernetes delivery |
 
 ---
 
-## 🧾 License
+## Contributing
 
-This project is licensed under the **Kleff Public License v1.0 (based on Apache 2.0)** —  
-see the [LICENSE](./LICENSE) file for details.
+Please review the [Contributing Guide](./CONTRIBUTING.md) before opening issues or pull requests. All participation in the Kleff community is governed by the [Code of Conduct](./CODE_OF_CONDUCT.md).
+
+To propose changes to organization-wide policies or documentation, open an issue or pull request in this repository. For broader project discussions, use [GitHub Discussions](https://github.com/orgs/kleffio/discussions).
+
+---
+
+## Security
+
+If you discover a vulnerability, follow the [Security Policy](./SECURITY.md) for responsible disclosure.
+**Do not open public issues for security vulnerabilities.**
+
+---
+
+## License
+
+This project is licensed under the **Kleff Public License v1.0** (based on Apache 2.0).
+See the [LICENSE](./LICENSE) file for full terms and conditions.
 
 ---
 

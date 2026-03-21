@@ -1,29 +1,88 @@
-name: "🐛 Bug report"
-description: "Report a bug in Kleff"
+name: "Bug Report"
+description: "Report a reproducible bug in Kleff"
 labels: ["bugfix"]
 body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for taking the time to file a bug report. Please fill out as much detail as possible to help us triage and fix the issue quickly.
+
+        Before submitting, please search existing issues to avoid duplicates.
+
+  - type: dropdown
+    id: component
+    attributes:
+      label: Affected Component
+      description: Which part of Kleff is affected?
+      options:
+        - Platform (API / backend)
+        - Panel (frontend dashboard)
+        - Gameserver Daemon
+        - Auth Service
+        - Infrastructure / Helm / Kubernetes
+        - CI / Workflows
+        - Documentation
+        - Other
+    validations:
+      required: true
+
   - type: textarea
     id: what-happened
     attributes:
       label: What happened?
-      description: Describe the bug and the expected behavior.
-      placeholder: "Clear, concise description"
+      description: Describe the bug clearly. Include what you expected to happen versus what actually happened.
+      placeholder: "Expected: ...\nActual: ..."
     validations:
       required: true
 
   - type: textarea
     id: steps
     attributes:
-      label: Steps to reproduce
-      description: How can we reproduce this?
-      placeholder: "1) ...\n2) ...\n3) ..."
+      label: Steps to Reproduce
+      description: Provide the minimal steps to reproduce the issue.
+      placeholder: |
+        1. ...
+        2. ...
+        3. ...
+    validations:
+      required: false
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant Logs or Output
+      description: Paste any relevant logs, stack traces, or error output. This will be rendered as code automatically.
+      render: shell
     validations:
       required: false
 
   - type: input
     id: version
     attributes:
-      label: Version / commit
-      placeholder: vX.Y.Z or commit SHA
+      label: Version / Commit
+      description: Which version or commit SHA are you running?
+      placeholder: "v1.2.3 or commit SHA"
+    validations:
+      required: false
+
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      description: Describe your deployment environment.
+      placeholder: "e.g. Kubernetes 1.30, Docker 24.0, self-hosted on Ubuntu 22.04"
+    validations:
+      required: false
+
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Severity
+      description: How severely does this bug impact your usage?
+      options:
+        - Critical — system unusable or data loss
+        - High — major feature broken, no workaround
+        - Medium — degraded functionality, workaround exists
+        - Low — minor issue or cosmetic
     validations:
       required: false
