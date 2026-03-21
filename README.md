@@ -13,12 +13,9 @@ The `.github` repository defines how the Kleff community operates, collaborates,
 | File | Description |
 |------|-------------|
 | [`profile/README.md`](./profile/README.md) | Public-facing README displayed on the [Kleff GitHub Organization](https://github.com/kleffio) page |
-| [`CONTRIBUTING.md`](./CONTRIBUTING.md) | Contribution guidelines, workflow, branch conventions, and code style |
 | [`CODE_OF_CONDUCT.md`](./CODE_OF_CONDUCT.md) | Community standards for respectful and inclusive participation |
-| [`SECURITY.md`](./SECURITY.md) | Responsible disclosure policy, severity levels, and vulnerability reporting |
-| [`VISION.md`](./VISION.md) | Long-term goals, guiding principles, and ecosystem roadmap |
+| [`CLA.md`](./CLA.md) | Contributor License Agreement — required to be signed before any contribution is merged |
 | [`LICENSE`](./LICENSE) | The MIT License governing all open-source repositories |
-| [`TRADEMARKS.md`](./TRADEMARKS.md) | Trademark usage guidelines for the Kleff name and branding |
 
 ---
 
@@ -26,10 +23,35 @@ The `.github` repository defines how the Kleff community operates, collaborates,
 
 GitHub automatically applies files from a `.github` repository as organization-wide defaults for any repository that does not define its own. This means:
 
-- **Code of Conduct**, **Contributing**, and **Security** policies apply globally by default.
+- **Code of Conduct** applies globally by default.
 - Individual repositories may override these by including their own copies at the root level.
 - The `profile/README.md` is rendered publicly on the organization's main GitHub page.
 - Workflow templates and issue/PR templates added here are available across all Kleff repositories.
+
+---
+
+## Contributor License Agreement (CLA)
+
+**All contributors must sign the CLA before any pull request can be merged.** This applies to every repository in the `kleffio` organization without exception.
+
+The CLA check is enforced via the reusable [`_cla`](./.github/workflows/_cla.yml) workflow. Each repository must call this workflow on pull request events. Signing is done automatically via a comment on the pull request the first time a contributor opens one.
+
+To call the CLA workflow from any repository:
+
+```yaml
+name: CLA
+on:
+  pull_request_target:
+    types: [opened, synchronize]
+  issue_comment:
+    types: [created]
+
+jobs:
+  cla:
+    uses: kleffio/.github/.github/workflows/_cla.yml@main
+    secrets:
+      personal_access_token: ${{ secrets.CLA_PERSONAL_ACCESS_TOKEN }}
+```
 
 ---
 
@@ -46,24 +68,9 @@ Kleff is an open-source hosting platform for web servers, game servers, and cont
 
 ---
 
-## Contributing
-
-Please review the [Contributing Guide](./CONTRIBUTING.md) before opening issues or pull requests. All participation in the Kleff community is governed by the [Code of Conduct](./CODE_OF_CONDUCT.md).
-
-To propose changes to organization-wide policies or documentation, open an issue or pull request in this repository. For broader project discussions, use [GitHub Discussions](https://github.com/orgs/kleffio/discussions).
-
----
-
-## Security
-
-If you discover a vulnerability, follow the [Security Policy](./SECURITY.md) for responsible disclosure.
-**Do not open public issues for security vulnerabilities.**
-
----
-
 ## License
 
-This project is licensed under the **MIT License** (based on Apache 2.0).
+This project is licensed under the **MIT License**.
 See the [LICENSE](./LICENSE) file for full terms and conditions.
 
 ---
@@ -71,5 +78,5 @@ See the [LICENSE](./LICENSE) file for full terms and conditions.
 <p align="center">
   <b>Build. Host. Scale. Your Way.</b><br />
   <sub>© 2025 Kleff Hosting — Open Source by <a href="https://github.com/isaacwallace123">Isaac Wallace</a></sub><br />
-  <sub>Licensed under the MIT License (based on Apache 2.0)</sub>
+  <sub>Licensed under the MIT License</sub>
 </p>
