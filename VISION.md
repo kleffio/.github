@@ -80,6 +80,5 @@ The platform we're building is designed to be owned by its community — not by 
 
 <p align="center">
   <b>Build. Host. Scale. Your Way.</b><br />
-  <sub>© 2025 Kleff Hosting — Open Source by <a href="https://github.com/isaacwallace123">Isaac Wallace</a></sub><br />
-  <sub>Licensed under the Kleff Public License v1.0 (based on Apache 2.0)</sub>
+  <sub>© 2025 Kleff Hosting — Open Source by <a href="https://github.com/isaacwallace123">Isaac Wallace</a></sub>
 </p>

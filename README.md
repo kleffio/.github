@@ -17,7 +17,7 @@ The `.github` repository defines how the Kleff community operates, collaborates,
 | [`CODE_OF_CONDUCT.md`](./CODE_OF_CONDUCT.md) | Community standards for respectful and inclusive participation |
 | [`SECURITY.md`](./SECURITY.md) | Responsible disclosure policy, severity levels, and vulnerability reporting |
 | [`VISION.md`](./VISION.md) | Long-term goals, guiding principles, and ecosystem roadmap |
-| [`LICENSE`](./LICENSE) | The Kleff Public License v1.0 governing all open-source repositories |
+| [`LICENSE`](./LICENSE) | The MIT License governing all open-source repositories |
 | [`TRADEMARKS.md`](./TRADEMARKS.md) | Trademark usage guidelines for the Kleff name and branding |
 
 ---
@@ -63,7 +63,7 @@ If you discover a vulnerability, follow the [Security Policy](./SECURITY.md) for
 
 ## License
 
-This project is licensed under the **Kleff Public License v1.0** (based on Apache 2.0).
+This project is licensed under the **MIT License** (based on Apache 2.0).
 See the [LICENSE](./LICENSE) file for full terms and conditions.
 
 ---
@@ -71,5 +71,5 @@ See the [LICENSE](./LICENSE) file for full terms and conditions.
 <p align="center">
   <b>Build. Host. Scale. Your Way.</b><br />
   <sub>© 2025 Kleff Hosting — Open Source by <a href="https://github.com/isaacwallace123">Isaac Wallace</a></sub><br />
-  <sub>Licensed under the Kleff Public License v1.0 (based on Apache 2.0)</sub>
+  <sub>Licensed under the MIT License (based on Apache 2.0)</sub>
 </p>

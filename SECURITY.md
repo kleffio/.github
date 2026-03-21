@@ -103,6 +103,5 @@ When deploying Kleff in production:
 
 <p align="center">
   <b>Build. Host. Scale. Your Way.</b><br />
-  <sub>Security is a shared responsibility — thank you for helping keep Kleff safe for everyone.</sub><br />
-  <sub>Licensed under the Kleff Public License v1.0 (based on Apache 2.0)</sub>
+  <sub>Security is a shared responsibility — thank you for helping keep Kleff safe for everyone.</sub>
 </p>

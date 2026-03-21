@@ -194,6 +194,5 @@ If your contribution touches authentication, authorization, container isolation,
 
 <p align="center">
   <b>Build. Host. Scale. Your Way.</b><br />
-  <sub>Thank you for helping shape the Kleff ecosystem — every contribution matters.</sub><br />
-  <sub>Licensed under the Kleff Public License v1.0 (based on Apache 2.0)</sub>
+  <sub>Thank you for helping shape the Kleff ecosystem — every contribution matters.</sub>
 </p>
